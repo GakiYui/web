@@ -4,30 +4,13 @@
 <meta charset="utf-8">
 <meta name="author" content="https://www.scut.tech" />
 <title>联接所有，赋能数据 - www.gdin.com.cn</title>
-<style>
-body{
-  margin:0; 
-  padding:0; 
-  overflow-y:hidden
-}
-</style>
-<script src="https://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
 <script type="text/javascript"> 
 window.onerror=function(){return true;} 
 $(function(){
-    var protocolStr = document.location.protocol;
-	if(protocolStr == "https:"){
-	    window.location.href = "http://gdin.gdwz.com:9080/ekp";
-	}else{		
-		headerH = 0;  
-		var h=$(window).height();
-		$("#iframe").height((h-headerH)+"px"); 
-	}
-  
+    window.location.href = "http://gdin.gdwz.com:9080/ekp";
 });
 </script>
 </head>
 <body>
-<iframe id="iframe" frameborder="0" src="http://gdin.gdwz.com:9080/ekp" style="width:100%;"></iframe>
 </body>
 </html>
