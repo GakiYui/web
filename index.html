@@ -14,14 +14,20 @@ body{
 <script src="https://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
 <script type="text/javascript"> 
 window.onerror=function(){return true;} 
-$(function(){ 
-  headerH = 0;  
-  var h=$(window).height();
-  $("#iframe").height((h-headerH)+"px"); 
+$(function(){
+    var protocolStr = document.location.protocol;
+	if(protocolStr == "https:"){
+	    window.location.href = "http://gdin.gdwz.com:9080/ekp";
+	}else{		
+		headerH = 0;  
+		var h=$(window).height();
+		$("#iframe").height((h-headerH)+"px"); 
+	}
+  
 });
 </script>
 </head>
 <body>
-<iframe id="iframe" frameborder="0" src="https://oa.scut.tech" style="width:100%;"></iframe>
+<iframe id="iframe" frameborder="0" src="http://gdin.gdwz.com:9080/ekp" style="width:100%;"></iframe>
 </body>
 </html>
