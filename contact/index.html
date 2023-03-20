@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>沧海拾贝 | 个人开发技术分享</title>
+    <meta content="基于Spring、React、Vue、Python，Spring Cloud微服务、K8s+istio服务网格、区块链的全栈开发技术，以及百度飞桨深度学习技术研究与分享" name="description">
+    <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
+    <link rel="i" href="/assets/img/favicon.png">
+    <link href="/assets/css/style.css" rel="stylesheet"/>
+</head>
+<body class="home">
+<header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="container-fluid container-lg d-flex align-items-center position-relative">
+        <a href="/" rel="home" title="沧海拾贝 | 个人开发技术分享"
+           class="me-auto">
+            <img alt="scut.tech" src="/assets/img/logo.png" width="214" height="30">
+        </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/privacy">License</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li class="nav-search-form">
+                    <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                          action="https://www.scut.tech/search">
+                        <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search">
+                            <svg class="icon icon-search" fill="currentColor">
+                                <use href="/assets/img/icons.svg#search"></use>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        <svg class="icon icon-search search-bar-toggle" fill="currentColor">
+            <use href="/assets/img/icons.svg#search"></use>
+        </svg>
+        <a href="#" class="mobile-nav-toggle mobile-nav-show" title="Toggle Menu">
+            <svg class="icon icon-menu" fill="currentColor">
+                <use href="/assets/img/icons.svg#menu"></use>
+            </svg>
+        </a> <a href="#" class="mobile-nav-toggle mobile-nav-hide d-none" title="Close Menu">
+        <svg class="icon icon-close" fill="currentColor">
+            <use href="/assets/img/icons.svg#close"></use>
+        </svg>
+    </a></div>
+</header>
+<main id="main" class="main">
+    <div class="container">
+        <div class="page-header"><h1 class="page-title">Contact</h1></div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="page-content"><p>Need to get in touch? No problem! You can use our contact form to send us a
+                    message.</p>
+                    <div class="support-license">
+                        <ul>
+                            <li>Need a support? Check our available <a href="/support">support
+                                options</a></li>
+                            <li>Want to remove the back links to scut.tech? Check our available <a
+                                    href="/privacy">licensing options</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <form class="contact-form mb-4" role="form" action="https://www.scut.tech/contact" method="POST">
+                    
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <input type="name" name="name" maxlength="50" class="form-control" id="contact-name"
+                                   placeholder="Your Name" required="">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="email" name="email" maxlength="50" class="form-control" id="contact-email"
+                                   placeholder="Your Email" required="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <input type="text" name="subject" maxlength="50" class="form-control" id="contact-subject"
+                                   placeholder="Subject" required="">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <textarea class="form-control" name="message" id="contact-message" maxlength="250"
+                                      placeholder="Your Message" rows="8" required=""></textarea></div>
+                        <div class="col-md-12"><label class="form-group custom-checkbox float-left">I've read and accept
+                            the
+                            <a href="/privacy">privacy policy</a>.
+                            <input type="checkbox" class="form-control" name="privacy-policy" value="accept"> <span
+                                    class="checkmark"></span> </label></div>
+                        <div class="col-md-12">
+                            <div class="loading"></div>
+                            <div class="error-message"></div>
+                            <div class="sent-message">Your message has been sent. Thank you!</div>
+                        </div>
+                        <div class="form-send col-md-12">
+                            <button type="submit" class="btn btn-large">Send Message</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<footer id="footer" class="footer">
+    <div class="copyright text-center">
+        ©2023 scut.tech
+        <a href="https://beian.miit.gov.cn/" target="_blank"
+           class="text">粤ICP备19159625号</a></div>
+</footer>
+<div title="Search" class="search-bar d-none">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                      action="https://www.scut.tech/search">
+                    <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                    <button type="submit" title="Search">
+                        <svg class="icon icon-search" fill="currentColor">
+                            <use href="/assets/img/icons.svg#search"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="#" class="scroll-top" title="Back to top">
+    <img alt="back_to_top" class="icon icon-arrow-up" fill="currentColor"
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
+</a>
+<script src="/assets/js/main.js?v=5.0"></script>
+<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+</body>
+</html>
