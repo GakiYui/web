@@ -1,0 +1,8 @@
+Sitemap: https://www.boolean.cn/sitemap.xml
+User-agent: *
+Disallow: /contact
+Disallow: /login
+Disallow: /members
+Disallow: /privacy
+Disallow: /support
+Disallow: /?tag*
