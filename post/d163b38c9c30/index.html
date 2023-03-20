@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>沧海拾贝 | 个人开发技术分享</title>
-    <meta content="基于Spring、React、Vue、Python，Spring Cloud微服务、K8s+istio服务网格、区块链的全栈开发技术，以及百度飞桨深度学习技术研究与分享" name="description">
+    <title>沧海拾贝 | Spring Security 入门（三）：Remember-Me 和注销登录</title>
+    <meta content="在实际开发中，为了用户登录方便常常会启用记住我（Remember-Me）功能。如果用户登录时勾选了“记住我”选项，那么在一段有效时间内，会默认自动登录，免去再次输入用户名、密码等登录操作。该功能的实现机理是根据用户登录信息生成 Token 并保存在用户浏览器的 Cookie 中，当用户需要再次登录时，自动实现校验并建立登录态的一种机制。﻿本文在前文&amp;nbsp" name="description">
     <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
     <link rel="icon" href="/assets/img/favicon.png">
     <link href="/assets/css/style.css" rel="stylesheet"/>
     <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
 <!--    <script type="text/javascript">-->
 <!--        (function(c,l,a,r,i,t,y){-->
 <!--            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};-->
@@ -68,143 +69,35 @@
                     <div class="article-list">
                         <ul>
                             <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17923246692">
-                                            <span>基于时间戳生成12位十六进制ID的算法</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>本文主要介绍一种基于时间戳生成12位十六进制ID的算法，作为替换常用的UUID生成方案，既能拥有UUID离散型的优点，又能解决其长度32位过长的问题...</span>
-                                    </div>
-                                </div>
+                                <h1 class="title">Spring Security 入门（三）：Remember-Me 和注销登录</h1>
                                 <ul class="list-item-action">
                                     <li>
-                                        <span>2023-03-18 21:08</span>
+                                        <span>2021-03-15 23:32</span>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">341</span>
+                                        <div> 字数 <span class="num">374</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">6</span>
+                                        阅读 <span class="num">32</span>
 
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d177edbf129f">
-                                            <span>Linux Mint 21.1安装使用笔记</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>本文主要记录在2008年的旧电脑上基于 Ubuntu 22.04 LTS 的 Linux Mint 21.1操作系统的安装、使用过程遇到的解决问题及解决方案</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-03-12 22:00</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">1,156</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">30</span>
-
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17703cf7d29">
-                                            <span>零基础实践深度学习</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>很高兴在【零基础实践深度学习】课程中与您相见，非常感谢您选择本课程作为深度学习实践的入门教材。本课程由百度杰出架构师、飞桨产品负责人和资深研发人员共同打造。他们在人工智能和深度学习领域深耕多年，作为行业的领航人，有着丰富的教学经验和工业实践经验。教程中阐述的很多观点和实践，都是作者多年的经验累积，是入门深度学习必须要掌握的基本功。本课程适配飞桨2.4版本，即可作为深度学习的入门读物，也可作为...</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-03-09 09:52</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">476</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">26</span>
-
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17615b339ea">
-                                            <span>再说 ant-design-vue 1.7.8 打包优化</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>在使用 vue-cli4 配置打包优化 提及在vue-cli4项目中，通过 highlight.js，实现了页面中代码高亮显示。但页面打开速度变慢了很多，chunk-vendors.30c0fb60.js有1.2M，页面加载需要耗时5.6s，需要进行打包优化处理。通过使用 cdn 加载、打包压缩等方式，终于把该文件减少到 275KB，首页加载时间减少到不足3s。但该内容已经是三年前的配置，...</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-03-05 10:04</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">2,898</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">49</span>
-
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17615595015">
-                                            <span>ant-design-pro 6.0.0 开启 gzip 压缩</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>使用 ant-design-pro 6.0.0 开发React后台管理应用时，默认打包方式并没有开启 gzip 压缩，可通过 compression-webpack-plugin 插件开启 gzip 压缩。国内环境为提高安装速度，建议采用 tyarn 进行安装，命令如下：npm -i yarn tyarn -g
-然后安装 compression-webpack-plugin ，命令如下：t...</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-01-05 09:45</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">1,007</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">49</span>
-
-                                    </li>
-                                </ul>
+                                <div class="show_content"><p><span style="color: rgb(35, 38, 59); background-color: rgba(255, 255, 255, 0.9);">在实际开发中，为了用户登录方便常常会启用记住我（Remember-Me）功能。如果用户登录时勾选了“记住我”选项，那么在一段有效时间内，会默认自动登录，免去再次输入用户名、密码等登录操作。该功能的实现机理是根据用户登录信息生成 Token 并保存在用户浏览器的 Cookie 中，当用户需要再次登录时，自动实现校验并建立登录态的一种机制。</span></p><p><span style="color: rgb(35, 38, 59); background-color: rgba(255, 255, 255, 0.9);">﻿本文在前文&nbsp;</span><a href="/post/d1761bb3b2ea" rel="noopener noreferrer" target="_blank" style="color: rgb(92, 142, 198); background-color: rgba(255, 255, 255, 0.9);">Spring Security 入门（二）：图形验证码和手机短信验证码</a><span style="color: rgb(35, 38, 59); background-color: rgba(255, 255, 255, 0.9);">&nbsp;的基础上介绍 Remember-Me 功能和注销登录。</span></p><p>阅读目录</p><p><br></p><p><br></p><ul><li><span style="color: rgb(92, 142, 198);">Remember-Me 功能</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">基本原理</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">简单加密 Token（基本使用）</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">简单加密 Token（源码分析）</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">持久化 Token（原理分析）</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">持久化 Token（基本使用）</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">持久化 Token（源码分析）</span></li><li><span style="color: rgb(92, 142, 198);">注销登录</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">基本使用</span></li><li class="ql-indent-1"><span style="color: rgb(92, 142, 198);">源码分析</span></li></ul><p><br></p><p>原文地址：<a href="https://www.cnblogs.com/zongmin/p/13783285.html" rel="noopener noreferrer" target="_blank">Spring Security 入门（三）：Remember-Me 和注销登录</a></p></div>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <ul class="pager">
-                    
+                    <li class="previous"><a
+                            href="/post/d1761bb3b2ea">&larr;
+                        <span>Spring Security 入门（二）：图形验证码和手机短信验证码</span> </a>
+                    </li>
                     <li class="next">
-                        <a href="https://www.scut.tech/?page=1">Older &rarr;</a>
+                        <a href="/post/d1761bbc105d"><span>Spring Security 入门（四）：Session 会话管理</span>
+                            &rarr;</a>
                     </li>
                 </ul>
             </div>
@@ -286,6 +179,8 @@
          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
 </a>
 <script src="/assets/js/main.js?v=5.0"></script>
+<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
         crossorigin="anonymous"></script>
 </body>

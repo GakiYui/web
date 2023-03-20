@@ -1,0 +1,159 @@
+* {
+    box-sizing: border-box;
+}
+
+.home {
+    width: auto;
+    margin: 0 auto;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+a {
+    color: rgba(0, 0, 0, 0.65);
+    text-decoration: none;
+}
+
+a:hover {
+    color: #337ab7;
+}
+
+h1 {
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+}
+
+.page-content, .aside {
+    margin-top: 15px;
+}
+
+.article-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8e8e8;
+    font-size: 14px;
+}
+
+.article-item .title {
+    font-weight: 500;
+    font-size: 24px;
+    font-family: -apple-system, SF UI Display, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei,
+    WenQuanYi Micro Hei, sans-serif;
+    line-height: 1.3;
+    word-break: break-word !important;
+    word-break: break-all;
+}
+
+.article-item .show_content {
+    color: #2f2f2f;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: break-word !important;
+    word-break: break-all;
+}
+
+.article-content .article-title {
+    color: rgba(0, 0, 0, .85) !important;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.article-description {
+    color: rgba(0, 0, 0, .45);
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.list-item-action {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    padding: 0;
+    font-size: 0;
+    list-style: none;
+}
+
+.list-item-action > li {
+    position: relative;
+    display: inline-block;
+    padding: 0 8px;
+    color: rgba(0, 0, 0, .45);
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.article-list .list-item-action > li:first-child {
+    padding-left: 0;
+}
+
+.list-item-action-split {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1px;
+    height: 14px;
+    margin-top: -7px;
+    background-color: #e8e8e8;
+}
+
+/* 字数及阅读量 */
+.num {
+    color: #3399ea;
+}
+
+.aside .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 20px;
+    padding-left: 12px;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 20px;
+    border-left: 4px solid #ec7259;
+}
+
+.pager {
+    padding-left: 0;
+    text-align: center;
+    list-style: none;
+}
+
+.pager li {
+    display: inline;
+}
+
+.pager li > a, .pager li > span {
+    display: inline-block;
+    padding: 5px 14px;
+}
+
+.pager .previous > a, .pager .previous > span {
+    float: left;
+}
+
+.pager .next > a, .pager .next > span {
+    float: right;
+}

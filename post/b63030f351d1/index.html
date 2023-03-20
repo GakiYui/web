@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>沧海拾贝 | 个人开发技术分享</title>
-    <meta content="基于Spring、React、Vue、Python，Spring Cloud微服务、K8s+istio服务网格、区块链的全栈开发技术，以及百度飞桨深度学习技术研究与分享" name="description">
+    <title>沧海拾贝 | Ant Design Pro 4.0动态菜单图标显示</title>
+    <meta content="在使用Ant Design Pro 4.0进行React开发时，可通过设置 icon 配置菜单图标，但这在 antd@4 中将无法得到支持，官方也提供了相应的插件来保留此功能。这在前端route.ts生成的静态菜单是有效的，但动态生成菜单时，发现并没有显示图标。经过调试，发现umi-plugin-antd-icon-config插件只在应用初始时生效。依葫芦" name="description">
     <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
     <link rel="icon" href="/assets/img/favicon.png">
     <link href="/assets/css/style.css" rel="stylesheet"/>
     <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
 <!--    <script type="text/javascript">-->
 <!--        (function(c,l,a,r,i,t,y){-->
 <!--            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};-->
@@ -68,143 +69,116 @@
                     <div class="article-list">
                         <ul>
                             <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17923246692">
-                                            <span>基于时间戳生成12位十六进制ID的算法</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>本文主要介绍一种基于时间戳生成12位十六进制ID的算法，作为替换常用的UUID生成方案，既能拥有UUID离散型的优点，又能解决其长度32位过长的问题...</span>
-                                    </div>
-                                </div>
+                                <h1 class="title">Ant Design Pro 4.0动态菜单图标显示</h1>
                                 <ul class="list-item-action">
                                     <li>
-                                        <span>2023-03-18 21:08</span>
+                                        <span>2020-03-18 10:00</span>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">341</span>
+                                        <div> 字数 <span class="num">3,023</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">6</span>
+                                        阅读 <span class="num">697</span>
 
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d177edbf129f">
-                                            <span>Linux Mint 21.1安装使用笔记</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>本文主要记录在2008年的旧电脑上基于 Ubuntu 22.04 LTS 的 Linux Mint 21.1操作系统的安装、使用过程遇到的解决问题及解决方案</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-03-12 22:00</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">1,156</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">30</span>
+                                <div class="show_content">在使用Ant Design Pro 4.0进行React开发时，可通过设置 icon 配置菜单图标，但这在 antd@4 中将无法得到支持，官方也提供了相应的插件来保留此功能。这在前端route.ts生成的静态菜单是有效的，但动态生成菜单时，发现并没有显示图标。经过调试，发现umi-plugin-antd-icon-config插件只在应用初始时生效。依葫芦画瓢，通过复制粘贴umi-plugin-antd-icon-config的代码到BasicLayout.tsx，菜单图标显示问题得到完美解决。
+<p><font color="red">注：官方出示例代码，请移步：<a href="https://prolayout.ant.design/menu#从服务器加载-menu-并且使用-icon" target="_blank">从服务器加载-menu-并且使用-icon</a></font></p>
+<h4>1、引入 antd@4 图标</h4>
+<pre><code>import * as allIcons from '@ant-design/icons/es';</pre></code>
+<h4>2、处理菜单数据的函数</h4>
+<pre><code>const toHump = (name: string) =>
+  name.replace(/-(\w)/g, (all: string, letter: any) => letter.toUpperCase());
+const formatter = (data: any[]) => {
+  data.forEach(item => {
+    if (item.icon) {
+      const { icon } = item;
+      const v4IconName = toHump(icon.replace(icon[0], icon[0].toUpperCase()));
+      const NewIcon = allIcons[icon] || allIcons[''.concat(v4IconName, 'Outlined')];
+      if (NewIcon) {
+        try {
+          // eslint-disable-next-line no-param-reassign
+          item.icon = React.createElement(NewIcon);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
 
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17703cf7d29">
-                                            <span>零基础实践深度学习</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>很高兴在【零基础实践深度学习】课程中与您相见，非常感谢您选择本课程作为深度学习实践的入门教材。本课程由百度杰出架构师、飞桨产品负责人和资深研发人员共同打造。他们在人工智能和深度学习领域深耕多年，作为行业的领航人，有着丰富的教学经验和工业实践经验。教程中阐述的很多观点和实践，都是作者多年的经验累积，是入门深度学习必须要掌握的基本功。本课程适配飞桨2.4版本，即可作为深度学习的入门读物，也可作为...</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-03-09 09:52</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">476</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">26</span>
+    if (item.routes || item.children) {
+      const children = formatter(item.routes || item.children); // Reduce memory usage
 
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17615b339ea">
-                                            <span>再说 ant-design-vue 1.7.8 打包优化</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>在使用 vue-cli4 配置打包优化 提及在vue-cli4项目中，通过 highlight.js，实现了页面中代码高亮显示。但页面打开速度变慢了很多，chunk-vendors.30c0fb60.js有1.2M，页面加载需要耗时5.6s，需要进行打包优化处理。通过使用 cdn 加载、打包压缩等方式，终于把该文件减少到 275KB，首页加载时间减少到不足3s。但该内容已经是三年前的配置，...</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-03-05 10:04</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">2,898</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">49</span>
+      item.children = children;
+    }
+  });
+  return data;
+};
 
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="article-item">
-                                <div class="article-content">
-                                    <h1 class="article-title">
-                                        <a href="/post/d17615595015">
-                                            <span>ant-design-pro 6.0.0 开启 gzip 压缩</span> </a>
-                                    </h1>
-                                    <div class="article-description">
-                                        <span>使用 ant-design-pro 6.0.0 开发React后台管理应用时，默认打包方式并没有开启 gzip 压缩，可通过 compression-webpack-plugin 插件开启 gzip 压缩。国内环境为提高安装速度，建议采用 tyarn 进行安装，命令如下：npm -i yarn tyarn -g
-然后安装 compression-webpack-plugin ，命令如下：t...</span>
-                                    </div>
-                                </div>
-                                <ul class="list-item-action">
-                                    <li>
-                                        <span>2023-01-05 09:45</span>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        <div> 字数 <span class="num">1,007</span>
-                                        </div>
-                                        <em class="list-item-action-split"></em>
-                                    </li>
-                                    <li>
-                                        阅读 <span class="num">49</span>
+const patchRoutes = (routes: any[]): any => formatter(routes);</pre></code>
+参考文档：<a href="https://pro.ant.design/blog/antd-4.0-cn" target="_blank">迁移 antd@4 指南</a>
+<h4>3、处理菜单数据</h4>
+<pre><code>  const [menuData, setMenuData] = useState([]);
+  useEffect(() => {
+    if (dispatch) {
+      dispatch({
+        type: 'user/fetchCurrent',
+      });
+    }
 
-                                    </li>
-                                </ul>
+    queryMenu().then(data => {
+      setMenuData(patchRoutes(data || []));
+    });
+  }, []);</pre></code>
+参考文档：<a href="https://www.scut.tech/post/b61711975b9c" target="_blank">Ant Design Pro 4.0从服务器请求菜单</a>
+<h4>4、菜单数据样例</h4>
+<pre><code>// 代码中会兼容本地 service mock 以及部署站点的静态数据
+export default {
+  // 支持值为 Object 和 Array
+  'GET /api/menu': [
+    {
+      path: '/',
+      redirect: '/welcome',
+    },
+    {
+      path: '/welcome',
+      name: 'welcome',
+      icon: 'smile',
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      icon: 'crown',
+      routes: [
+        {
+          path: '/admin/sub-page',
+          name: 'sub-page',
+          icon: 'smile',
+        },
+      ],
+    },
+    {
+      name: 'list.table-list',
+      icon: 'table',
+      path: '/list',
+    },
+  ],
+};
+</pre></code></div>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <ul class="pager">
-                    
+                    <li class="previous"><a
+                            href="/post/b6178b292fe4">&larr;
+                        <span>Ant Design Pro 4.0表单与Switch数据绑定</span> </a>
+                    </li>
                     <li class="next">
-                        <a href="https://www.scut.tech/?page=1">Older &rarr;</a>
+                        <a href="/post/d1761bb5d605"><span>Spring Security 入门（一）：认证和原理分析</span>
+                            &rarr;</a>
                     </li>
                 </ul>
             </div>
@@ -286,6 +260,8 @@
          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
 </a>
 <script src="/assets/js/main.js?v=5.0"></script>
+<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
         crossorigin="anonymous"></script>
 </body>

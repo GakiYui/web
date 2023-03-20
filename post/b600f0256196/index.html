@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>沧海拾贝 | Spring Cloud Gateway获取POST请求内容</title>
+    <meta content="项目突然增加限制超级管理员只能内网访问的需求，由于项目使用Spring Cloud开发，希望能通过网关增加过滤器进行拦截处理。经过参考相关文档验证，Spring Cloud Gateway可通过RouteLocator及GatewayFilter获取POST请求内容，具体版本为Hoxton.SR1，对应spring-boot的版本为2.2.2.RELEASE" name="description">
+    <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
+    <link rel="icon" href="/assets/img/favicon.png">
+    <link href="/assets/css/style.css" rel="stylesheet"/>
+    <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
+<!--    <script type="text/javascript">-->
+<!--        (function(c,l,a,r,i,t,y){-->
+<!--            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};-->
+<!--            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;-->
+<!--            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);-->
+<!--        })(window, document, "clarity", "script", "gb6xtiz2jy");-->
+<!--    </script>-->
+</head>
+<body class="home">
+<header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="container-fluid container-lg d-flex align-items-center position-relative">
+        <a href="/" rel="home" title="沧海拾贝 | 个人开发技术分享"
+           class="me-auto">
+            <img alt="scut.tech" src="/assets/img/logo.png" width="214" height="30">
+        </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="https://www.scut.tech/privacy">License</a></li>
+                <li><a href="https://www.scut.tech/contact">Contact</a></li>
+<!--                <li><a href="/members" class="memberarea ">-->
+<!--                    <svg class="icon icon-user2" fill="currentColor">-->
+<!--                        <use th:href="@{/assets/img/icons.svg#user2}"></use>-->
+<!--                    </svg>-->
+<!--                    <span>Members</span></a></li>-->
+                <li class="nav-search-form">
+                    <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                          action="https://www.scut.tech/search">
+                        <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search">
+                            <svg class="icon icon-search" fill="currentColor">
+                                <use href="/assets/img/icons.svg#search"></use>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        <svg class="icon icon-search search-bar-toggle" fill="currentColor">
+            <use href="/assets/img/icons.svg#search"></use>
+        </svg>
+        <a href="#" class="mobile-nav-toggle mobile-nav-show" title="Toggle Menu">
+            <svg class="icon icon-menu" fill="currentColor">
+                <use href="/assets/img/icons.svg#menu"></use>
+            </svg>
+        </a> <a href="#" class="mobile-nav-toggle mobile-nav-hide d-none" title="Close Menu">
+        <svg class="icon icon-close" fill="currentColor">
+            <use href="/assets/img/icons.svg#close"></use>
+        </svg>
+    </a></div>
+</header>
+<main id="main" class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-content">
+                    <div class="article-list">
+                        <ul>
+                            <li class="article-item">
+                                <h1 class="title">Spring Cloud Gateway获取POST请求内容</h1>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2020-01-15 15:10</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">5,402</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">262</span>
+
+                                    </li>
+                                </ul>
+                                <div class="show_content"><p>项目突然增加限制超级管理员只能内网访问的需求，由于项目使用Spring Cloud开发，希望能通过网关增加过滤器进行拦截处理。经过参考相关文档验证，Spring Cloud Gateway可通过RouteLocator及GatewayFilter获取POST请求内容，具体版本为Hoxton.SR1，对应spring-boot的版本为2.2.2.RELEASE。</p>
+<h4>1、DemoController用于模拟数据接收服务接口：</h4>
+<pre><code>
+package tech.scut.gateway.controller;
+
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+import org.springframewrk.web.bind.annotation.GetMapping;
+import org.springframewrk.web.bind.annotation.PostMapping;
+import org.springframewrk.web.bind.annotation.RequestBody;
+import org.springframewrk.web.bind.annotation.RestController;
+
+@Log4j2
+@RestController
+public class DemoController {
+
+    @PostMapping(path = "hello/test")
+    public PlayBoy sayHi(@RequestBdy PlayBoy body) {
+        log.info("请求 say hi 方法..."+body);
+        return body;
+    }
+}
+
+@Data
+class PlayBoy {
+    private String id;
+    private String name;
+    private int age;
+}
+</code></pre>
+<h4>2、CustomGatewayFilter实现了GatewayFilter，可以通过路由缓存获取RequestBody内容：</h4>
+<pre><code>
+package tech.scut.gateway.filter;
+
+import lombok.extern.log4j.Log4j2;
+import org.springframewrk.cloud.gateway.filter.GatewayFilter;
+import org.springframewrk.cloud.gateway.filter.GatewayFilterChain;
+import org.springframewrk.steretype.Component;
+import org.springframewrk.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+@Log4j2
+@Component
+public class CustomGatewayFilter implements GatewayFilter {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        Object requestBody = exchange.getAttribute("cachedRequestBodyObject");
+        log.info("request body is:{}", requestBody);
+
+        return chain.filter(exchange).then(Mono.fromRunnable(() -> {
+            log.info("RequestFilter post filter");
+        }));
+    }
+}</code></pre>
+<h4>3、GatewayApplicatin是应用程序入口，通过注入RouteLocator实现路由拦截：</h4>
+<pre><code>
+package tech.scut.gateway;
+
+import org.springframewrk.beans.factroy.annotation.Autwired;
+import org.springframewrk.beans.factroy.annotation.Value;
+import org.springframewrk.boot.SpringApplication;
+import org.springframewrk.boot.autoconfigure.SpringBootApplication;
+import org.springframewrk.cloud.gateway.route.RouteLocator;
+import org.springframewrk.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframewrk.context.annotation.Bean;
+import org.springframewrk.http.HttpMethod;
+import tech.scut.gateway.filter.CustomGatewayFilter;
+
+@SpringBootApplication
+public class GatewayApplication {
+    @Value("${test.uri:http://localhost:8080}")
+    String uri;
+    @Autwired
+    CustomGatewayFilter customGatewayFilter;
+
+    public static vid main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
+
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route("read_body_pred",
+                        r -> r
+                                .method(HttpMethod.POST)
+                                .and()
+                                .readBody(Object.class, requestBody -> {
+                                    return true;
+                                })
+                                .and().path("/test")
+                                .filters(f -> {
+                                            f
+                                                    .prefixPath("/hell")
+                                                    .filter(customGatewayFilter);
+                                            return f;
+                                        }
+                                )
+                                .uri(uri)
+                )
+                .build();
+    }
+}</code></pre>
+通过Postman以POST方式提交 application/josn 数据到问http://localhost:8080/test，控制台打印日志如下：
+<pre><code>
+2020-01-15 14:51:42.921  INFO 14652 --- [ctr-http-ni-2] t.s.gateway.filter.CustmGatewayFilter   : request body is:{id=111111, name=张三丰, age=18}
+2020-01-15 14:51:43.042  INFO 14652 --- [ctr-http-ni-4] t.s.gateway.controller.DemoController    : 请求 say hi 方法...PlayBoy(id=111111, name=张三丰, age=18)
+2020-01-15 14:51:43.070  INFO 14652 --- [ctr-http-ni-3] t.s.gateway.filter.CustomGatewayFilter   : RequestFilter post filter
+</code></pre>
+jsn数据内容如下：
+<pre><code>{
+"id":"111111",
+"name":"张三丰",
+"age":18
+}</code></pre>
+<h4>4、pom.xml文件完整信息如下：</h4>
+<pre><code>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframewrk.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.2.2.RELEASE&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+    &lt;/parent&gt;
+    &lt;groupId&gt;tech.scut&lt;/groupId&gt;
+    &lt;artifactId&gt;gateway&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;name&gt;gateway&lt;/name&gt;
+    &lt;description&gt;Demo project for Spring Boot&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;java.versin&gt;1.8&lt;/java.versin&gt;
+        &lt;spring-cloud.version&gt;Hoxton.SR1&lt;/spring-cloud.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframewrk.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-gateway&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframewrk.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;
+            &lt;scope&gt;runtime&lt;/scope&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframewrk.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.vintage&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-vintage-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframewrk.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;${spring-cloud.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframewrk.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;skipTests&gt;true&lt;/skipTests&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;
+</code></pre></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <ul class="pager">
+                    <li class="previous"><a
+                            href="/post/26ec819006cb">&larr;
+                        <span>使用 vue-cli4 配置打包优化</span> </a>
+                    </li>
+                    <li class="next">
+                        <a href="/post/b61711975b9c"><span>Ant Design Pro 4.0从服务器请求菜单</span>
+                            &rarr;</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <div class="aside">
+                    <h4 class="title">推荐阅读</h4>
+                    <ul>
+                        <li class="article-item">
+                            <a href="/post/26ec819006cb" title="使用 vue-cli4 配置打包优化">
+                                <span>使用 vue-cli4 配置打包优化</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b63030f351d1" title="Ant Design Pro 4.0动态菜单图标显示">
+                                <span>Ant Design Pro 4.0动态菜单图标显示</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b61711975b9c" title="Ant Design Pro 4.0从服务器请求菜单">
+                                <span>Ant Design Pro 4.0从服务器请求菜单</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2bca10c0da1c" title="Eclipse 4 RCP窗口居中-使用LifeCycleHandler">
+                                <span>Eclipse 4 RCP窗口居中-使用LifeCycleHandler</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2b7db5bbc709" title="JPA使用Example查询结果为空的问题">
+                                <span>JPA使用Example查询结果为空的问题</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b600f0256196" title="Spring Cloud Gateway获取POST请求内容">
+                                <span>Spring Cloud Gateway获取POST请求内容</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2f5cf45b7b51" title="Ant Design of React项目实战">
+                                <span>Ant Design of React项目实战</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/27626b08146b" title="Vue预渲染卡在Building fresh packages...">
+                                <span>Vue预渲染卡在Building fresh packages...</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer id="footer" class="footer">
+    <div class="copyright text-center">
+        ©2023 scut.tech
+        <a href="https://beian.miit.gov.cn/" target="_blank"
+           class="text">粤ICP备19159625号</a></div>
+</footer>
+<div title="Search" class="search-bar d-none">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                      action="https://www.scut.tech/search">
+                    <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                    <button type="submit" title="Search">
+                        <svg class="icon icon-search" fill="currentColor">
+                            <use href="/assets/img/icons.svg#search"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="#" class="scroll-top" title="Back to top">
+    <img alt="back_to_top" class="icon icon-arrow-up" fill="currentColor"
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
+</a>
+<script src="/assets/js/main.js?v=5.0"></script>
+<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
+        crossorigin="anonymous"></script>
+</body>
+</html>
