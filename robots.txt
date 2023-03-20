@@ -5,4 +5,4 @@ Disallow: /login
 Disallow: /members
 Disallow: /privacy
 Disallow: /support
-Disallow: /?tag*
+Disallow: /*?
