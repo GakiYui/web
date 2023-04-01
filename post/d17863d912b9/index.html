@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>沧海拾贝 | 基于PaddleTS的LSTNet时序预测模型实现中国人口预测</title>
-    <meta content="本项目属于机器学习范畴，根据指定数据集（中国人口数据集等）使用PaddleTS进行LSTNet网络模型搭建全流程，包括数据预处理、模型构建、模型训练、模型预测、预测结果可视化等。我们将根据中国人口数据集中的多个特征（features），例如：出生人口(万)、中国人均GPA(美元计)、中国性别比例(按照女生=100)、自然增长率(%)等8个特征字段，预测中国未" name="description">
+    <meta content="本项目属于机器学习范畴，根据指定数据集（中国人口数据集等）使用PaddleTS进行LSTNet网络模型搭建全流程，包括数据预处理、模型构建、模型训练、模型预测、预测结果可视化等。" name="description">
     <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
     <link rel="icon" href="/assets/img/favicon.png">
     <link href="/assets/css/style.css" rel="stylesheet"/>
@@ -21,8 +21,13 @@
         <nav id="navbar" class="navbar">
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="/privacy">License</a></li>
-                <li><a href="/contact">Contact</a></li>
+                <li><a href="https://www.scut.tech/privacy">License</a></li>
+                <li><a href="https://www.scut.tech/contact">Contact</a></li>
+<!--                <li><a href="/members" class="memberarea ">-->
+<!--                    <svg class="icon icon-user2" fill="currentColor">-->
+<!--                        <use th:href="@{/assets/img/icons.svg#user2}"></use>-->
+<!--                    </svg>-->
+<!--                    <span>Members</span></a></li>-->
                 <li class="nav-search-form">
                     <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
                           action="https://www.scut.tech/search">
@@ -64,16 +69,24 @@
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">801</span>
+                                        <div> 字数 <span class="num">524</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">18</span>
+                                        阅读 <span class="num">29</span>
 
                                     </li>
                                 </ul>
-                                <div class="show_content"><p><span style="color: rgb(0, 0, 0);">本项目属于机器学习范畴，根据指定数据集（中国人口数据集等）使用PaddleTS进行LSTNet网络模型搭建全流程，包括数据预处理、模型构建、模型训练、模型预测、预测结果可视化等。</span></p><ol><li>我们将根据中国人口数据集中的多个特征（features），例如：出生人口(万)、中国人均GPA(美元计)、中国性别比例(按照女生=100)、自然增长率(%)等8个特征字段，预测中国未来总人口(万人)这1个标签字段。属于多输入，单输出LSTM神经网路预测范畴。</li><li>对于本项目使用的工具PaddleTS，PaddleTS是一个易用的深度时序建模的Python库，它基于飞桨深度学习框架PaddlePaddle，专注业界领先的深度模型，旨在为领域专家和行业用户提供可扩展的时序建模能力和便捷易用的用户体验。</li><li>尤其是其内置业界领先的深度学习模型，包括NBEATS、NHiTS、LSTNet、TCN、Transformer, DeepAR（概率预测）、Informer等时序预测模型，以及TS2Vec等时序表征模型。本项目将使用其中的LSTNet深度学习模型完成项目开发。</li></ol><p><span style="color: rgb(0, 0, 0);">LSTM（Long Short Term Memory networks）出现以来，在捕获时间序列依赖关系方面表现出了强大的潜力，LSTM由三个门来控制细胞状态，这三个门分别称为忘记门、输入门和输出门，细胞状态像传送带一样。它贯穿整个细胞却只有很少的分支，这样能保证信息不变的流过整个RNN。LSTM是一种特殊的RNN，主要是为了解决长序列训练过程中的梯度消失和梯度爆炸问题。</span></p><p><span style="color: rgb(0, 0, 0);">2018年，正式提出了LSTNet。该网络是一种专门设计用于时间序列预测的深度学习网络，LSTNet的出现可以认为是研究人员通过注意力机制提升LSTM模型时序预测能力的一次尝试。</span></p><p>教程地址：<a href="https://aistudio.baidu.com/aistudio/projectdetail/5149510" rel="noopener noreferrer" target="_blank">https://aistudio.baidu.com/aistudio/projectdetail/5149510</a></p></div>
+                                <div class="show_content"><p><span style="color: rgb(0, 0, 0);">本项目属于机器学习范畴，根据指定数据集（中国人口数据集等）使用PaddleTS进行LSTNet网络模型搭建全流程，包括数据预处理、模型构建、模型训练、模型预测、预测结果可视化等。</span></p>
+<ol>
+<li>我们将根据中国人口数据集中的多个特征（features），例如：出生人口(万)、中国人均GPA(美元计)、中国性别比例(按照女生=100)、自然增长率(%)等8个特征字段，预测中国未来总人口(万人)这1个标签字段。属于多输入，单输出LSTM神经网路预测范畴。</li>
+<li>对于本项目使用的工具PaddleTS，PaddleTS是一个易用的深度时序建模的Python库，它基于飞桨深度学习框架PaddlePaddle，专注业界领先的深度模型，旨在为领域专家和行业用户提供可扩展的时序建模能力和便捷易用的用户体验。</li>
+<li>尤其是其内置业界领先的深度学习模型，包括NBEATS、NHiTS、LSTNet、TCN、Transformer, DeepAR（概率预测）、Informer等时序预测模型，以及TS2Vec等时序表征模型。本项目将使用其中的LSTNet深度学习模型完成项目开发。</li>
+</ol>
+<p><span style="color: rgb(0, 0, 0);">LSTM（Long Short Term Memory networks）出现以来，在捕获时间序列依赖关系方面表现出了强大的潜力，LSTM由三个门来控制细胞状态，这三个门分别称为忘记门、输入门和输出门，细胞状态像传送带一样。它贯穿整个细胞却只有很少的分支，这样能保证信息不变的流过整个RNN。LSTM是一种特殊的RNN，主要是为了解决长序列训练过程中的梯度消失和梯度爆炸问题。</span></p>
+<p><span style="color: rgb(0, 0, 0);">2018年，正式提出了LSTNet。该网络是一种专门设计用于时间序列预测的深度学习网络，LSTNet的出现可以认为是研究人员通过注意力机制提升LSTM模型时序预测能力的一次尝试。</span></p>
+<p>教程地址：<a href="https://aistudio.baidu.com/aistudio/projectdetail/5149510" target="_blank" rel="noopener noreferrer">https://aistudio.baidu.com/aistudio/projectdetail/5149510</a></p></div>
                             </li>
                         </ul>
                     </div>
@@ -169,7 +182,8 @@
 <script src="/assets/js/main.js?v=5.0"></script>
 <script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
+<script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
         crossorigin="anonymous"></script>
 </body>
 </html>

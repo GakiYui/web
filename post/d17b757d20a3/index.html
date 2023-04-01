@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>沧海拾贝 | istio + k8s 如何增加节点和删除节点？</title>
+    <meta content="在使用 istio + k8s 集群时，可能需要增加或删除节点，这对于版本平滑升级来说非常重要。本文详细介绍了在 istio + k8s 环境下增加和删除节点的过程，以供参考。" name="description">
+    <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
+    <link rel="icon" href="/assets/img/favicon.png">
+    <link href="/assets/css/style.css" rel="stylesheet"/>
+    <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
+</head>
+<body class="home">
+<header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="container-fluid container-lg d-flex align-items-center position-relative">
+        <a href="/" rel="home" title="沧海拾贝 | 个人开发技术分享"
+           class="me-auto">
+            <img alt="scut.tech" src="/assets/img/logo.png" width="214" height="30">
+        </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="https://www.scut.tech/privacy">License</a></li>
+                <li><a href="https://www.scut.tech/contact">Contact</a></li>
+<!--                <li><a href="/members" class="memberarea ">-->
+<!--                    <svg class="icon icon-user2" fill="currentColor">-->
+<!--                        <use th:href="@{/assets/img/icons.svg#user2}"></use>-->
+<!--                    </svg>-->
+<!--                    <span>Members</span></a></li>-->
+                <li class="nav-search-form">
+                    <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                          action="https://www.scut.tech/search">
+                        <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search">
+                            <svg class="icon icon-search" fill="currentColor">
+                                <use href="/assets/img/icons.svg#search"></use>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        <svg class="icon icon-search search-bar-toggle" fill="currentColor">
+            <use href="/assets/img/icons.svg#search"></use>
+        </svg>
+        <a href="#" class="mobile-nav-toggle mobile-nav-show" title="Toggle Menu">
+            <svg class="icon icon-menu" fill="currentColor">
+                <use href="/assets/img/icons.svg#menu"></use>
+            </svg>
+        </a> <a href="#" class="mobile-nav-toggle mobile-nav-hide d-none" title="Close Menu">
+        <svg class="icon icon-close" fill="currentColor">
+            <use href="/assets/img/icons.svg#close"></use>
+        </svg>
+    </a></div>
+</header>
+<main id="main" class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-content">
+                    <div class="article-list">
+                        <ul>
+                            <li class="article-item">
+                                <h1 class="title">istio + k8s 如何增加节点和删除节点？</h1>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2023-03-28 18:23</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">390</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">14</span>
+
+                                    </li>
+                                </ul>
+                                <div class="show_content"><p>在使用 istio + k8s 集群时，可能需要增加或删除节点，这对于版本平滑升级来说非常重要。那么，在 istio + k8s 环境下是如何处理的呢？答案其实很简单，就是普通的 k8s 节点处理即可。</p>
+<h2>一、删除节点</h2>
+<p>如果需要在k8s集群中删除节点，首先需要在master节点上删除该节点的相关数据，再删除该节点，接着在该节点上进行 reset 操作，接着删除相关文件。</p>
+<h3>1.1 在 master 节点操作</h3>
+<pre class="language-python"><code># 其中&lt; node name &gt;是在k8s集群中使用&lt; kubectl get nodes &gt;查询到的节点名称
+kubectl drain &lt;node name&gt; --delete-local-data --force --ignore-daemonsets
+kubectl delete node &lt;node name&gt;</code></pre>
+<h3>1.2 在需要删除的节点上</h3>
+<pre class="language-python"><code># 重置k8s
+sudo kubeadm reset</code></pre>
+<h2>二、增加节点</h2>
+<p>一般来说在 k8s 集群初始化完成的时候，会输出一条 token 来让我们添加其他的节点，但是这个 token 的有效时间只有24小时。</p>
+<h3>2.1 查询token</h3>
+<pre class="language-python"><code>kubeadm token list</code></pre>
+<h3>2.2 创建一个token</h3>
+<pre class="language-python"><code>kubeadm token create</code></pre>
+<h3>2.3 创建证书</h3>
+<p>除了token之外，我们还需要一个sha256的加密字符串，这个我们可以这样获得：</p>
+<pre class="language-python"><code>openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2&gt;/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'</code></pre>
+<h3>2.4 添加节点</h3>
+<p>接下来我们就可以把node节点添加到集群中了，命令的格式如下：</p>
+<pre class="language-python"><code>kubeadm join &lt;集群master节点IP：端口&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;sha256&gt;</code></pre>
+<p>对应的操作命令如下：</p>
+<pre class="language-python"><code>kubeadm join 192.168.20.100:6443 --token duinff.mca0i3mnigoeyf4o \
+        --discovery-token-ca-cert-hash sha256:e3bcbc9e93daf2c2b280516a2982086843f5c650ccbc8bd6d76131b219b64d6b	</code></pre></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <ul class="pager">
+                    <li class="previous"><a
+                            href="/post/d17b3bd098b4">&larr;
+                        <span>Istio + k8s 安装 Redis 集群</span> </a>
+                    </li>
+                    
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <div class="aside">
+                    <h4 class="title">推荐阅读</h4>
+                    <ul>
+                        <li class="article-item">
+                            <a href="/post/26ec819006cb" title="使用 vue-cli4 配置打包优化">
+                                <span>使用 vue-cli4 配置打包优化</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b63030f351d1" title="Ant Design Pro 4.0动态菜单图标显示">
+                                <span>Ant Design Pro 4.0动态菜单图标显示</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b61711975b9c" title="Ant Design Pro 4.0从服务器请求菜单">
+                                <span>Ant Design Pro 4.0从服务器请求菜单</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2bca10c0da1c" title="Eclipse 4 RCP窗口居中-使用LifeCycleHandler">
+                                <span>Eclipse 4 RCP窗口居中-使用LifeCycleHandler</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2b7db5bbc709" title="JPA使用Example查询结果为空的问题">
+                                <span>JPA使用Example查询结果为空的问题</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b600f0256196" title="Spring Cloud Gateway获取POST请求内容">
+                                <span>Spring Cloud Gateway获取POST请求内容</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2f5cf45b7b51" title="Ant Design of React项目实战">
+                                <span>Ant Design of React项目实战</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/27626b08146b" title="Vue预渲染卡在Building fresh packages...">
+                                <span>Vue预渲染卡在Building fresh packages...</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer id="footer" class="footer">
+    <div class="copyright text-center">
+        ©2023 scut.tech
+        <a href="https://beian.miit.gov.cn/" target="_blank"
+           class="text">粤ICP备19159625号</a></div>
+</footer>
+<div title="Search" class="search-bar d-none">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                      action="https://www.scut.tech/search">
+                    <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                    <button type="submit" title="Search">
+                        <svg class="icon icon-search" fill="currentColor">
+                            <use href="/assets/img/icons.svg#search"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="#" class="scroll-top" title="Back to top">
+    <img alt="back_to_top" class="icon icon-arrow-up" fill="currentColor"
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
+</a>
+<script src="/assets/js/main.js?v=5.0"></script>
+<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
+        crossorigin="anonymous"></script>
+</body>
+</html>

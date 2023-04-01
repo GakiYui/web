@@ -21,8 +21,13 @@
         <nav id="navbar" class="navbar">
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="/privacy">License</a></li>
-                <li><a href="/contact">Contact</a></li>
+                <li><a href="https://www.scut.tech/privacy">License</a></li>
+                <li><a href="https://www.scut.tech/contact">Contact</a></li>
+<!--                <li><a href="/members" class="memberarea ">-->
+<!--                    <svg class="icon icon-user2" fill="currentColor">-->
+<!--                        <use th:href="@{/assets/img/icons.svg#user2}"></use>-->
+<!--                    </svg>-->
+<!--                    <span>Members</span></a></li>-->
                 <li class="nav-search-form">
                     <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
                           action="https://www.scut.tech/search">
@@ -64,12 +69,12 @@
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">1,156</span>
+                                        <div> 字数 <span class="num">1,157</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">30</span>
+                                        阅读 <span class="num">40</span>
 
                                     </li>
                                 </ul>
@@ -78,7 +83,7 @@
 <p>使用 Ventoy 作为启动盘安装 Linux Mint 21.1 镜像。根据官方网站介绍，<a href="https://www.ventoy.net/" target="_blank" rel="noopener noreferrer">Ventoy </a>是一个制作可启动U盘的开源工具。 有了 Ventoy 你就无需反复地格式化U盘，你只需要把 ISO/WIM/IMG/VHD(x)/EFI 等类型的文件直接拷贝到U盘里面就可以启动了，无需其他操作。</p>
 <p>根据官方文档制作好 Ventoy 启动盘后，通过 Linux Mint 官网下载 <a href="https://linuxmint.com/download.php" target="_blank" rel="noopener noreferrer">Linux Mint 21.1 "Vera"</a><span style="color: rgb(51, 51, 51);"> ISO 镜像，放到启动盘根目录，然后设置 U 盘启动，选择 ISO 镜像，Boot in normal mode 进入桌面，然后点击安装部署快捷方式进行安装部署即可。</span></p>
 <h3><span style="color: rgb(51, 51, 51);">二、使用篇</span></h3>
-<p><span style="color: rgb(51, 51, 51);">安装完 Linux mint 21.1 之后，感觉开机时间有点长，大概要两三分钟，并且进入系统后，图形界面容易卡住不能，但鼠标可以移动，就界面没反应了。下面通过流水的方式记录遇到的问题及解决办法。</span></p>
+<p><span style="color: rgb(51, 51, 51);">安装完 Linux mint 21.1 之后，感觉开机时间有点长，大概要两三分钟，并且进入系统后，图形界面容易卡住不能动</span><span style="color: rgb(51, 51, 51);">，</span><span style="color: rgb(51, 51, 51);">但鼠标可以移动，就界面没反应了。下面通过流水的方式记录遇到的问题及解决办法。</span></p>
 <h4><span style="color: rgb(51, 51, 51);">1、启动时间优化</span></h4>
 <p><span style="color: rgb(51, 51, 51);">通过 systemd-analyze 命令，可以列出 Linux mint 每个服务启动所需时间的信息，包括启动时内核、initrd和用户空间所花费的时间。</span></p>
 <pre class="ql-syntax" spellcheck="false"><code># systemd-analyze</code>
@@ -212,7 +217,8 @@ exec "${HERE}"/netease-cloud-music $@
 <script src="/assets/js/main.js?v=5.0"></script>
 <script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
+<script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
         crossorigin="anonymous"></script>
 </body>
 </html>

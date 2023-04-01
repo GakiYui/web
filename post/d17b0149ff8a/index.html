@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>沧海拾贝 | Istio + k8s 安装部署过程</title>
+    <meta content="本文记录了 CentOS 7.x 环境下安装部署 istio + k8s 的详细过程以及遇到的问题，使用版本为 kubeadm v1.25.8 及 istio v1.15.6，k8s 环境采用三台服务器搭建一主两从架构。" name="description">
+    <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
+    <link rel="icon" href="/assets/img/favicon.png">
+    <link href="/assets/css/style.css" rel="stylesheet"/>
+    <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
+</head>
+<body class="home">
+<header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="container-fluid container-lg d-flex align-items-center position-relative">
+        <a href="/" rel="home" title="沧海拾贝 | 个人开发技术分享"
+           class="me-auto">
+            <img alt="scut.tech" src="/assets/img/logo.png" width="214" height="30">
+        </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="https://www.scut.tech/privacy">License</a></li>
+                <li><a href="https://www.scut.tech/contact">Contact</a></li>
+<!--                <li><a href="/members" class="memberarea ">-->
+<!--                    <svg class="icon icon-user2" fill="currentColor">-->
+<!--                        <use th:href="@{/assets/img/icons.svg#user2}"></use>-->
+<!--                    </svg>-->
+<!--                    <span>Members</span></a></li>-->
+                <li class="nav-search-form">
+                    <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                          action="https://www.scut.tech/search">
+                        <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search">
+                            <svg class="icon icon-search" fill="currentColor">
+                                <use href="/assets/img/icons.svg#search"></use>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        <svg class="icon icon-search search-bar-toggle" fill="currentColor">
+            <use href="/assets/img/icons.svg#search"></use>
+        </svg>
+        <a href="#" class="mobile-nav-toggle mobile-nav-show" title="Toggle Menu">
+            <svg class="icon icon-menu" fill="currentColor">
+                <use href="/assets/img/icons.svg#menu"></use>
+            </svg>
+        </a> <a href="#" class="mobile-nav-toggle mobile-nav-hide d-none" title="Close Menu">
+        <svg class="icon icon-close" fill="currentColor">
+            <use href="/assets/img/icons.svg#close"></use>
+        </svg>
+    </a></div>
+</header>
+<main id="main" class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-content">
+                    <div class="article-list">
+                        <ul>
+                            <li class="article-item">
+                                <h1 class="title">Istio + k8s 安装部署过程</h1>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2023-03-26 23:28</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">1,169</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">27</span>
+
+                                    </li>
+                                </ul>
+                                <div class="show_content"><p>由于云服务器机房迁移，周末重新部署了 istio + k8s，使用版本为 kubeadm v1.25.8 及 istio v1.15.6，由于每次部署总遇到些问题，记录下来以供参考。</p>
+<p>本次 k8s 环境采用三台服务器搭建一主两从架构，hostname 分别设置命名为 k8s-master、k8s-node1、k8s-node2。</p>
+<table style="border-collapse: collapse; width: 90.8749%; height: 146px; border-width: 1px; border-style: solid;" border="1"><colgroup><col style="width: 32.2104%;"><col style="width: 37.2042%;"><col style="width: 30.4625%;"></colgroup>
+<tbody>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">服务器名称</td>
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">服务器IP</td>
+<td style="text-align: center; border-width: 1px;">操作系统</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">k8s-master</td>
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">192.168.20.100</td>
+<td style="text-align: center; border-width: 1px;">CentOS 7.6</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">k8s-node1</td>
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">192.168.20.101</td>
+<td style="text-align: center; border-width: 1px;">CentOS 7.6</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">k8s-node2</td>
+<td style="height: 22.3906px; text-align: center; border-width: 1px;">192.168.20.102</td>
+<td style="text-align: center; border-width: 1px;">CentOS 7.6</td>
+</tr>
+</tbody>
+</table>
+<h2>一、环境准备</h2>
+<h3>1.1 安装相关工具</h3>
+<pre class="language-python"><code>yum install yum-utils -y
+yum install wget -y
+yum install vim -y
+yum upgrade</code></pre>
+<h3>1.2 设置 yum 国内源</h3>
+<pre class="language-python"><code>wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo</code></pre>
+<h3>1.3 关闭防火墙</h3>
+<p>防火墙一定要提前关闭，否则在后续安装K8S集群的时候是个trouble maker。执行下面语句关闭，并禁用开机启动：</p>
+<pre class="language-python"><code>systemctl stop firewalld &amp; systemctl disable firewalld</code></pre>
+<h3>1.4 关闭Swap</h3>
+<p>在安装 k8s 集群时，Linux 的 Swap 内存交换机制是一定要关闭的，否则会因为内存交换而影响性能以及稳定性。这里，我们可以提前进行设置。</p>
+<pre class="language-python"><code>sed -ri 's/.*swap.*/#&amp;/' /etc/fstab
+swapoff -a</code></pre>
+<h2>二、安装 docker</h2>
+<p>安装kubernetes前，必须要先安装Docker。</p>
+<h3>2.1 添加阿里云的Docker仓库</h3>
+<pre class="language-python"><code>yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+yum makecache</code></pre>
+<h3>2.2 执行以下命令，安装最新版Docker</h3>
+<pre class="language-python"><code>yum install docker-ce -y</code></pre>
+<p>运行docker --version,可以看到安装了截止目前最新版本。</p>
+<h3>2.3 启动Docker服务并激活开机启动</h3>
+<pre class="language-python"><code>systemctl start docker &amp; systemctl enable docker</code></pre>
+<h2>三、安装 kubernrtes</h2>
+<h3>3.1 执行以下命令添加kubernetes.repo仓库</h3>
+<pre class="language-python"><code>cat &gt; /etc/yum.repos.d/kubernetes.repo &lt;&lt; EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF</code></pre>
+<h3>3.2 关闭swap、防火墙</h3>
+<p>环境准备时已经关闭，这里略过。</p>
+<h3>3.3 关闭 SeLinux</h3>
+<pre class="language-python"><code>setenforce 0</code></pre>
+<h3>3.4 将桥接的 IPv4 流量传递到 iptables 的链</h3>
+<pre class="language-python"><code>cat &gt; /etc/sysctl.d/k8s.conf &lt;&lt; EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+# 生效
+sysctl --system</code></pre>
+<h3>3.5 安装 kubelet、kubeadm、kubectl</h3>
+<pre class="language-python"><code>yum install -y kubelet-1.25.8 kubeadm-1.25.8 kubectl-1.25.8</code></pre>
+<p>如需安装最新版本，可以执行如下命令：</p>
+<pre class="language-python"><code>yum install -y kubelet kubeadm kubectl</code></pre>
+<p><span style="color: rgb(224, 62, 45);">如需卸载</span>，可执行如下命令：</p>
+<pre class="language-python"><code>yum remove -y kubelet kubeadm kubectl</code></pre>
+<h3>3.6 启动 kubelet</h3>
+<pre class="language-python"><code>systemctl enable kubelet &amp;&amp; systemctl start kubelet</code></pre>
+<h3>3.7 列出需要的镜像</h3>
+<pre class="language-python"><code>kubeadm config images list</code></pre>
+<p>得到所有需要的组件，也就是以下七个组件：</p>
+<pre class="language-python"><code>registry.k8s.io/kube-apiserver:v1.25.8
+registry.k8s.io/kube-controller-manager:v1.25.8
+registry.k8s.io/kube-scheduler:v1.25.8
+registry.k8s.io/kube-proxy:v1.25.8
+registry.k8s.io/pause:3.8
+registry.k8s.io/etcd:3.5.4-0
+registry.k8s.io/coredns/coredns:v1.9.3</code></pre>
+<h3>3.8 设置 hosts</h3>
+<p>分别登录k8s-master、k8s-node1、k8s-node2，执行 hostnamectl set-hostname hostname 设置 hosts，如 k8s-master 命令如下：</p>
+<pre class="language-python"><code>hostnamectl set-hostname k8s-master</code></pre>
+<p>然后在 k8s-master 设置 /etc/hosts 如下：</p>
+<pre class="language-python"><code>cat &gt;&gt; /etc/hosts &lt;&lt; EOF
+# 185.199.111.133 raw.githubusercontent.com
+192.168.20.100 k8s-master
+192.168.20.101 k8s-node1
+192.168.20.102 k8s-node2
+EOF
+
+systemctl restart network</code></pre>
+<h3>3.9 初始化 k8s-master</h3>
+<pre class="language-python"><code>kubeadm init \
+--apiserver-advertise-address=192.168.20.100 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.25.8 \
+--service-cidr=10.96.0.0/12 \
+--pod-network-cidr=10.244.0.0/16</code></pre>
+<p>初始成功后，将打印如下日志：</p>
+<pre class="language-python"><code>Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.20.100:6443 --token s3t3oe.4d7iiye9bsnzmo7k \
+        --discovery-token-ca-cert-hash sha256:7ec91d6152705878a07fe418542f46fcbdd3eef8175433b933aaa5269a0d1dfe</code></pre>
+<p>按日志要求，先在 k8s-master 执行如下命令：</p>
+<pre class="language-python"><code>mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl get nodes</code></pre>
+<h3>3.10 部署 CNI 网络插件（k8s-master）</h3>
+<p>部署CNI网络插件（如果有网络问题，需要/etc/hosts增加域名解析如：199.232.68.133 raw.githubusercontent.com），然后执行：</p>
+<pre class="language-python"><code>kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</code></pre>
+<p>或者直接下载&nbsp;<a title="kube-flannel.yml" href="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml" target="_blank" rel="noopener">https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</a></p>
+<p>然后执行：</p>
+<pre class="language-python"><code>kubectl apply -f kube-flannel.yml</code></pre>
+<p>查看运行状态：</p>
+<pre class="language-python"><code>kubectl get pods -n kube-system
+kubectl get nodes</code></pre>
+<h3>3.11 初始化 node（初始化 master 时提示内容）</h3>
+<p>分别登录各节点，执行如下命令加入集群：</p>
+<pre class="language-python"><code>kubeadm join 192.168.20.100:6443 --token s3t3oe.4d7iiye9bsnzmo7k \
+        --discovery-token-ca-cert-hash sha256:7ec91d6152705878a07fe418542f46fcbdd3eef8175433b933aaa5269a0d1dfe</code></pre>
+<p>注1：如果报错</p>
+<pre class="language-python"><code>[ERROR CRI]: container runtime is not running: output: E0624 18:07:53.735108   17940 remote_runtime.go:925] "Status from runtime service failed" err="rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.RuntimeService"</code></pre>
+<p>执行如下命令，注释掉 disabled_plugins = ["cri"] ：</p>
+<pre class="language-python"><code>vim /etc/containerd/config.toml</code></pre>
+<p><span style="color: rgb(224, 62, 45);">如果出现该错误，需要全部节点处理，包括 k8s-master、k8s-node1、k8s-node2 等</span><br>然后重启 containerd 和 kubeadm:</p>
+<pre class="language-python"><code>systemctl restart containerd
+kubeadm reset</code></pre>
+<p>注2：使用kubeadm创建集群失败报Unable to register node with API server，查看日志发现例如：failed to pull image \"k8s.gcr.io/pause:3.6\"</p>
+<p>可分别登录各节点，执行如下命令：</p>
+<pre class="language-python"><code>ctr -n k8s.io i pull registry.aliyuncs.com/google_containers/pause:3.6
+ctr -n k8s.io i tag registry.aliyuncs.com/google_containers/pause:3.6 k8s.gcr.io/pause:3.6</code></pre>
+<h2>四、安装 istio</h2>
+<h3>4.1 下载 istio</h3>
+<pre class="language-python"><code>wget https://github.com/istio/istio/releases/download/1.15.6/istio-1.15.6-linux-amd64.tar.gz</code></pre>
+<p>解压到 /usr/local</p>
+<pre class="language-python"><code>tar zxvf istio-1.15.6-linux-amd64.tar.gz -C /usr/local/</code></pre>
+<p>4.2 设置环境变量</p>
+<pre class="language-python"><code>echo 'export ISTIO_HOME=/usr/local/istio-1.15.6' &gt;&gt; /etc/profile
+echo 'export PATH=$PATH:$ISTIO_HOME/bin' &gt;&gt; /etc/profile
+source /etc/profile</code></pre>
+<h3>4.3 查看版本</h3>
+<pre class="language-python"><code>istioctl version</code></pre>
+<p>如上环境准备好后，就可以根据官方文档安装 istio 了。</p>
+<pre class="language-python"><code>istioctl install --set profile=demo</code></pre>
+<p><a title="Install with Istioctl" href="https://istio.io/latest/docs/setup/install/istioctl/" target="_blank" rel="noopener">https://istio.io/latest/docs/setup/install/istioctl/</a></p></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <ul class="pager">
+                    <li class="previous"><a
+                            href="/post/d17923246692">&larr;
+                        <span>基于时间戳生成12位十六进制ID的算法</span> </a>
+                    </li>
+                    <li class="next">
+                        <a href="/post/d17b3bd098b4"><span>Istio + k8s 安装 Redis 集群</span>
+                            &rarr;</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <div class="aside">
+                    <h4 class="title">推荐阅读</h4>
+                    <ul>
+                        <li class="article-item">
+                            <a href="/post/26ec819006cb" title="使用 vue-cli4 配置打包优化">
+                                <span>使用 vue-cli4 配置打包优化</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b63030f351d1" title="Ant Design Pro 4.0动态菜单图标显示">
+                                <span>Ant Design Pro 4.0动态菜单图标显示</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b61711975b9c" title="Ant Design Pro 4.0从服务器请求菜单">
+                                <span>Ant Design Pro 4.0从服务器请求菜单</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2bca10c0da1c" title="Eclipse 4 RCP窗口居中-使用LifeCycleHandler">
+                                <span>Eclipse 4 RCP窗口居中-使用LifeCycleHandler</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2b7db5bbc709" title="JPA使用Example查询结果为空的问题">
+                                <span>JPA使用Example查询结果为空的问题</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b600f0256196" title="Spring Cloud Gateway获取POST请求内容">
+                                <span>Spring Cloud Gateway获取POST请求内容</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2f5cf45b7b51" title="Ant Design of React项目实战">
+                                <span>Ant Design of React项目实战</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/27626b08146b" title="Vue预渲染卡在Building fresh packages...">
+                                <span>Vue预渲染卡在Building fresh packages...</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer id="footer" class="footer">
+    <div class="copyright text-center">
+        ©2023 scut.tech
+        <a href="https://beian.miit.gov.cn/" target="_blank"
+           class="text">粤ICP备19159625号</a></div>
+</footer>
+<div title="Search" class="search-bar d-none">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                      action="https://www.scut.tech/search">
+                    <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                    <button type="submit" title="Search">
+                        <svg class="icon icon-search" fill="currentColor">
+                            <use href="/assets/img/icons.svg#search"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="#" class="scroll-top" title="Back to top">
+    <img alt="back_to_top" class="icon icon-arrow-up" fill="currentColor"
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
+</a>
+<script src="/assets/js/main.js?v=5.0"></script>
+<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
+        crossorigin="anonymous"></script>
+</body>
+</html>

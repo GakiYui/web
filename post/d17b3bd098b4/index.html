@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>沧海拾贝 | Istio + k8s 安装 Redis 集群</title>
+    <meta content="本文介绍了在 istio + k8s 环境下安装部署 redis 集群的详细过程，包括 nfs 及 pv 配置，以及遇到的问题及解决方案。" name="description">
+    <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
+    <link rel="icon" href="/assets/img/favicon.png">
+    <link href="/assets/css/style.css" rel="stylesheet"/>
+    <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
+</head>
+<body class="home">
+<header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="container-fluid container-lg d-flex align-items-center position-relative">
+        <a href="/" rel="home" title="沧海拾贝 | 个人开发技术分享"
+           class="me-auto">
+            <img alt="scut.tech" src="/assets/img/logo.png" width="214" height="30">
+        </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="https://www.scut.tech/privacy">License</a></li>
+                <li><a href="https://www.scut.tech/contact">Contact</a></li>
+<!--                <li><a href="/members" class="memberarea ">-->
+<!--                    <svg class="icon icon-user2" fill="currentColor">-->
+<!--                        <use th:href="@{/assets/img/icons.svg#user2}"></use>-->
+<!--                    </svg>-->
+<!--                    <span>Members</span></a></li>-->
+                <li class="nav-search-form">
+                    <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                          action="https://www.scut.tech/search">
+                        <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search">
+                            <svg class="icon icon-search" fill="currentColor">
+                                <use href="/assets/img/icons.svg#search"></use>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        <svg class="icon icon-search search-bar-toggle" fill="currentColor">
+            <use href="/assets/img/icons.svg#search"></use>
+        </svg>
+        <a href="#" class="mobile-nav-toggle mobile-nav-show" title="Toggle Menu">
+            <svg class="icon icon-menu" fill="currentColor">
+                <use href="/assets/img/icons.svg#menu"></use>
+            </svg>
+        </a> <a href="#" class="mobile-nav-toggle mobile-nav-hide d-none" title="Close Menu">
+        <svg class="icon icon-close" fill="currentColor">
+            <use href="/assets/img/icons.svg#close"></use>
+        </svg>
+    </a></div>
+</header>
+<main id="main" class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-content">
+                    <div class="article-list">
+                        <ul>
+                            <li class="article-item">
+                                <h1 class="title">Istio + k8s 安装 Redis 集群</h1>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2023-03-27 21:47</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">939</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">24</span>
+
+                                    </li>
+                                </ul>
+                                <div class="show_content"><h2>一、安装 NFS 存储</h2>
+<p>创建 NFS 存储主要是为了给 Redis 提供稳定的后端存储，当 Redis 的 Pod 重启或迁移后，依然能获得原先的数据。这里，我们先要创建 NFS，然后通过使用 PV 为 Redis 挂载一个远程的 NFS 路径。</p>
+<h3>1.1 安装 NFS</h3>
+<pre class="language-python"><code>yum -y install nfs-utils
+yum -y install rpcbind</code></pre>
+<h3>1.2 新增 /etc/exports 文件，设置共享路径</h3>
+<pre class="language-python"><code>cat &lt;&lt; EOF &gt; /etc/exports
+/data/redis/cluster0 *(rw,sync,no_root_squash)
+/data/redis/cluster1 *(rw,sync,no_root_squash)
+/data/redis/cluster2 *(rw,sync,no_root_squash)
+/data/redis/cluster3 *(rw,sync,no_root_squash)
+/data/redis/cluster4 *(rw,sync,no_root_squash)
+/data/redis/cluster5 *(rw,sync,no_root_squash)
+EOF</code></pre>
+<h3>1.3 创建相应目录</h3>
+<pre class="language-python"><code>mkdir -p /data/redis/cluster{0..5}</code></pre>
+<h3>1.4 启动 NFS 和 rpcbind 服务</h3>
+<pre class="language-python"><code>systemctl restart rpcbind
+systemctl restart nfs
+systemctl enable nfs
+exportfs -v</code></pre>
+<h3>1.5 客户端</h3>
+<pre class="language-python"><code>yum -y install nfs-utils</code></pre>
+<h3>1.6 查看存储共享</h3>
+<pre class="language-python"><code>showmount -e 192.168.20.100</code></pre>
+<h2>二、配置 Redis 集群</h2>
+<h3>2.1 创建命名空间</h3>
+<p>namespace.yaml 内容如下：</p>
+<pre class="language-java"><code>apiVersion: v1
+kind: Namespace
+metadata:
+  name: scut-tech</code></pre>
+<p>命令如下：</p>
+<pre class="language-python"><code>kubectl apply -f namespace.yaml</code></pre>
+<h3>2.2 创建 PV</h3>
+<p>每一个 Redis Pod 都需要一个独立的 PV 来存储自己的数据，因此可以创建一个 pv.yaml 文件，包含6个PV（具体内容请查看 pv.yaml）。</p>
+<pre class="language-java"><code>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv0
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.20.100
+    path: /data/redis/cluster0
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv1
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.20.100
+    path: /data/redis/cluster1
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv2
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.20.100
+    path: /data/redis/cluster2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv3
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.20.100
+    path: /data/redis/cluster3
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv4
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.20.100
+    path: /data/redis/cluster4
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv5
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.20.100
+    path: /data/redis/cluster5
+
+</code></pre>
+<p>命令如下：</p>
+<pre class="language-python"><code>kubectl create -f pv.yaml</code></pre>
+<h3>2.3 创建 Configmap</h3>
+<h4>2.3.1 创建 redis.conf</h4>
+<pre class="language-python"><code>cat &lt;&lt; EOF &gt; redis.conf
+appendonly yes
+cluster-enabled yes
+cluster-config-file /var/lib/redis/nodes.conf
+cluster-node-timeout 5000
+dir /var/lib/redis
+port 6379
+EOF</code></pre>
+<h4>2.3.2 根据 redis.conf 创建 Configmap</h4>
+<pre class="language-python"><code>kubectl create configmap redis-conf -n scut-tech --from-file=redis.conf</code></pre>
+<h4>2.3.3 查看创建的 Configmap</h4>
+<pre class="language-python"><code>kubectl describe cm redis-conf -n scut-tech</code></pre>
+<h2>三、创建 Redis 集群</h2>
+<h3>3.1 创建 redis.yaml</h3>
+<pre class="language-java"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: scut-tech
+  labels:
+    app: redis
+spec:
+  selector:
+    app: redis
+    appCluster: redis-cluster
+  ports:
+  - name: redis
+    port: 6379
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-access
+  namespace: scut-tech
+  labels:
+    app: redis
+spec:
+  selector:
+    app: redis
+    appCluster: redis-cluster
+  ports:
+  - name: redis-access
+    protocol: TCP
+    port: 6379
+    targetPort: 6379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: scut-tech
+spec:
+  serviceName: redis
+  replicas: 6
+  selector:
+    matchLabels:
+      app: redis
+      appCluster: redis-cluster
+  template:
+    metadata:
+      labels:
+        app: redis
+        appCluster: redis-cluster
+    spec:
+      terminationGracePeriodSeconds: 20
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - redis
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: redis
+        image: redis:latest
+        command:
+        - "redis-server"
+        args:
+        - "/etc/redis/redis.conf"
+        - "--protected-mode"
+        - "no"
+        - "--cluster-announce-ip"
+        - "$(POD_IP)"
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "1Gi"
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        - containerPort: 16379
+          name: cluster
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /etc/redis
+        - name: data
+          mountPath: /var/lib/redis
+      volumes:
+      - name: conf
+        configMap:
+          name: redis-conf
+          items:
+          - key: redis.conf
+            path: redis.conf
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      namespace: scut-tech
+    spec:
+      accessModes: ["ReadWriteMany"]
+      resources:
+        requests:
+          storage: 2Gi
+
+</code></pre>
+<p>命令如下：</p>
+<pre class="language-python"><code>kubectl apply -f redis.yaml</code></pre>
+<h3>3.2 初始化集群</h3>
+<p>查看集群节点状态：</p>
+<pre class="language-python"><code>kubectl get pods -n scut-tech</code></pre>
+<p>所有节点（redis-0 ~ redis-5）的 STATUS 都是 Running 状态后，再执行如下命令初始化集群：</p>
+<pre class="language-python"><code>kubectl exec -it redis-0 -n scut-tech -- redis-cli --cluster create `kubectl get pods -n scut-tech -l app=redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 '|awk '{print $1" "$2" "$3" "$4" "$5" "$6" "}'` --cluster-replicas 1</code></pre>
+<h3>3.3 验证集群部署</h3>
+<pre class="language-python"><code>kubectl exec -it redis-0 -n scut-tech -- redis-cli cluster info 
+for x in $(seq 0 5); do echo "redis-$x"; kubectl exec redis-$x -n cluster-redis -- redis-cli role; echo; done</code></pre>
+<h3>3.4 查看pod对应的DNS域名</h3>
+<pre class="language-python"><code>for x in $(seq 0 5); do kubectl exec redis-$x -n scut-tech -- hostname -f; done</code></pre>
+<h2>四、问题解答</h2>
+<h3>4.1 redis 集群出错怎样处理？</h3>
+<h4>4.1.1 删除集群</h4>
+<pre class="language-python"><code>kubectl delete -f redis.yaml</code></pre>
+<h4><br>4.1.2删除 nfs 配置</h4>
+<pre class="language-python"><code>rm -rf /data/redis/cluster*/**</code></pre>
+<h4><br>4.1.3 重启集群</h4>
+<pre class="language-python"><code>kubectl apply -f redis.yaml</code></pre>
+<h4><br>4.1.4 重新初始化集群</h4>
+<p>查看集群状态，所有的 redis 节点都正常启动后，再执行如下命令初始化集群：</p>
+<pre class="language-python"><code>kubectl exec -it redis-0 -n scut-tech -- redis-cli --cluster create `kubectl get pods -n scut-tech -l app=redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 '|awk '{print $1" "$2" "$3" "$4" "$5" "$6" "}'` --cluster-replicas 1</code></pre></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <ul class="pager">
+                    <li class="previous"><a
+                            href="/post/d17b0149ff8a">&larr;
+                        <span>Istio + k8s 安装部署过程</span> </a>
+                    </li>
+                    <li class="next">
+                        <a href="/post/d17b757d20a3"><span>istio + k8s 如何增加节点和删除节点？</span>
+                            &rarr;</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <div class="aside">
+                    <h4 class="title">推荐阅读</h4>
+                    <ul>
+                        <li class="article-item">
+                            <a href="/post/26ec819006cb" title="使用 vue-cli4 配置打包优化">
+                                <span>使用 vue-cli4 配置打包优化</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b63030f351d1" title="Ant Design Pro 4.0动态菜单图标显示">
+                                <span>Ant Design Pro 4.0动态菜单图标显示</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b61711975b9c" title="Ant Design Pro 4.0从服务器请求菜单">
+                                <span>Ant Design Pro 4.0从服务器请求菜单</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2bca10c0da1c" title="Eclipse 4 RCP窗口居中-使用LifeCycleHandler">
+                                <span>Eclipse 4 RCP窗口居中-使用LifeCycleHandler</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2b7db5bbc709" title="JPA使用Example查询结果为空的问题">
+                                <span>JPA使用Example查询结果为空的问题</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/b600f0256196" title="Spring Cloud Gateway获取POST请求内容">
+                                <span>Spring Cloud Gateway获取POST请求内容</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/2f5cf45b7b51" title="Ant Design of React项目实战">
+                                <span>Ant Design of React项目实战</span>
+                            </a>
+                        </li>
+                        <li class="article-item">
+                            <a href="/post/27626b08146b" title="Vue预渲染卡在Building fresh packages...">
+                                <span>Vue预渲染卡在Building fresh packages...</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer id="footer" class="footer">
+    <div class="copyright text-center">
+        ©2023 scut.tech
+        <a href="https://beian.miit.gov.cn/" target="_blank"
+           class="text">粤ICP备19159625号</a></div>
+</footer>
+<div title="Search" class="search-bar d-none">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form class="search-form d-flex align-items-center ajaxform" data-append="#main" method="POST"
+                      action="https://www.scut.tech/search">
+                    <input type="text" value="" name="q" placeholder="Search" title="Enter search keyword">
+                    <button type="submit" title="Search">
+                        <svg class="icon icon-search" fill="currentColor">
+                            <use href="/assets/img/icons.svg#search"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="#" class="scroll-top" title="Back to top">
+    <img alt="back_to_top" class="icon icon-arrow-up" fill="currentColor"
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
+</a>
+<script src="/assets/js/main.js?v=5.0"></script>
+<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
+        crossorigin="anonymous"></script>
+</body>
+</html>
