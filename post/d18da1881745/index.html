@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>沧海拾贝 | Istio + k8s 安装 Redis 集群</title>
-    <meta content="本文介绍了在 istio + k8s 环境下安装部署 redis 集群的详细过程，包括 nfs 及 pv 配置，以及遇到的问题及解决方案。" name="description">
+    <title>沧海拾贝 | Istio 安装配置 Kiali 仪表板</title>
+    <meta content="本文记录了 Istio 安装配置 Kiali 仪表板过程，通过修改 spec.ports 及 spec.type 配置项暴露 NodePort 来实现外部访问" name="description">
     <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
     <link rel="icon" href="/assets/img/favicon.png">
     <link href="/assets/css/style.css" rel="stylesheet"/>
@@ -62,305 +62,95 @@
                     <div class="article-list">
                         <ul>
                             <li class="article-item">
-                                <h1 class="title">Istio + k8s 安装 Redis 集群</h1>
+                                <h1 class="title">Istio 安装配置 Kiali 仪表板</h1>
                                 <ul class="list-item-action">
                                     <li>
-                                        <span>2023-03-27 21:47</span>
+                                        <span>2023-04-06 23:06</span>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">939</span>
+                                        <div> 字数 <span class="num">396</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">68</span>
+                                        阅读 <span class="num">35</span>
 
                                     </li>
                                 </ul>
-                                <div class="show_content"><h2>一、安装 NFS 存储</h2>
-<p>创建 NFS 存储主要是为了给 Redis 提供稳定的后端存储，当 Redis 的 Pod 重启或迁移后，依然能获得原先的数据。这里，我们先要创建 NFS，然后通过使用 PV 为 Redis 挂载一个远程的 NFS 路径。</p>
-<h3>1.1 安装 NFS</h3>
-<pre class="language-python"><code>yum -y install nfs-utils
-yum -y install rpcbind</code></pre>
-<h3>1.2 新增 /etc/exports 文件，设置共享路径</h3>
-<pre class="language-python"><code>cat &lt;&lt; EOF &gt; /etc/exports
-/data/redis/cluster0 *(rw,sync,no_root_squash)
-/data/redis/cluster1 *(rw,sync,no_root_squash)
-/data/redis/cluster2 *(rw,sync,no_root_squash)
-/data/redis/cluster3 *(rw,sync,no_root_squash)
-/data/redis/cluster4 *(rw,sync,no_root_squash)
-/data/redis/cluster5 *(rw,sync,no_root_squash)
-EOF</code></pre>
-<h3>1.3 创建相应目录</h3>
-<pre class="language-python"><code>mkdir -p /data/redis/cluster{0..5}</code></pre>
-<h3>1.4 启动 NFS 和 rpcbind 服务</h3>
-<pre class="language-python"><code>systemctl restart rpcbind
-systemctl restart nfs
-systemctl enable nfs
-exportfs -v</code></pre>
-<h3>1.5 客户端</h3>
-<pre class="language-python"><code>yum -y install nfs-utils</code></pre>
-<h3>1.6 查看存储共享</h3>
-<pre class="language-python"><code>showmount -e 192.168.20.100</code></pre>
-<h2>二、配置 Redis 集群</h2>
-<h3>2.1 创建命名空间</h3>
-<p>namespace.yaml 内容如下：</p>
-<pre class="language-java"><code>apiVersion: v1
-kind: Namespace
-metadata:
-  name: scut-tech</code></pre>
-<p>命令如下：</p>
-<pre class="language-python"><code>kubectl apply -f namespace.yaml</code></pre>
-<h3>2.2 创建 PV</h3>
-<p>每一个 Redis Pod 都需要一个独立的 PV 来存储自己的数据，因此可以创建一个 pv.yaml 文件，包含6个PV（具体内容请查看 pv.yaml）。</p>
-<pre class="language-java"><code>apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-pv0
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-  - ReadWriteMany
-  nfs:
-    server: 192.168.20.100
-    path: /data/redis/cluster0
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-pv1
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-  - ReadWriteMany
-  nfs:
-    server: 192.168.20.100
-    path: /data/redis/cluster1
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-pv2
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-  - ReadWriteMany
-  nfs:
-    server: 192.168.20.100
-    path: /data/redis/cluster2
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-pv3
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-  - ReadWriteMany
-  nfs:
-    server: 192.168.20.100
-    path: /data/redis/cluster3
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-pv4
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-  - ReadWriteMany
-  nfs:
-    server: 192.168.20.100
-    path: /data/redis/cluster4
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-pv5
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-  - ReadWriteMany
-  nfs:
-    server: 192.168.20.100
-    path: /data/redis/cluster5
-
-</code></pre>
-<p>命令如下：</p>
-<pre class="language-python"><code>kubectl create -f pv.yaml</code></pre>
-<h3>2.3 创建 Configmap</h3>
-<h4>2.3.1 创建 redis.conf</h4>
-<pre class="language-python"><code>cat &lt;&lt; EOF &gt; redis.conf
-appendonly yes
-cluster-enabled yes
-cluster-config-file /var/lib/redis/nodes.conf
-cluster-node-timeout 5000
-dir /var/lib/redis
-port 6379
-EOF</code></pre>
-<h4>2.3.2 根据 redis.conf 创建 Configmap</h4>
-<pre class="language-python"><code>kubectl create configmap redis-conf -n scut-tech --from-file=redis.conf</code></pre>
-<h4>2.3.3 查看创建的 Configmap</h4>
-<pre class="language-python"><code>kubectl describe cm redis-conf -n scut-tech</code></pre>
-<h2>三、创建 Redis 集群</h2>
-<h3>3.1 创建 redis.yaml</h3>
-<pre class="language-java"><code>apiVersion: v1
-kind: Service
-metadata:
-  name: redis
-  namespace: scut-tech
-  labels:
-    app: redis
-spec:
-  selector:
-    app: redis
-    appCluster: redis-cluster
-  ports:
-  - name: redis
-    port: 6379
-  clusterIP: None
----
+                                <div class="show_content"><p>Istio 和几个遥测应用做了集成。 遥测能帮你了解服务网格的结构、展示网络的拓扑结构、分析网格的健康状态。<br>使用下面说明部署 Kiali 仪表板、 以及 Prometheus、 Grafana、 还有 Jaeger。</p>
+<h3>1、安装 Kiali 和其他插件，等待部署完成</h3>
+<pre class="language-python"><code>[root@k8s-master ~]# cd /usr/local/istio-1.15.6
+[root@k8s-master istio-1.15.6]# kubectl apply -f samples/addons
+[root@k8s-master istio-1.15.6]# kubectl rollout status deployment/kiali -n istio-system</code></pre>
+<h3>2、访问 Kiali 仪表板</h3>
+<pre class="language-python"><code>[root@k8s-master istio-1.15.6]# istioctl dashboard kiali --address 192.168.1.59 -p 20001</code></pre>
+<p>http://192.168.1.59:20001/kiali<br>Failed to open browser; open http://192.168.1.59:20001/kiali in your browser.</p>
+<p>此时创建的 service 不提供外部访问，我们修改 service 来暴露 NodePort 以支持外部访问</p>
+<pre class="language-python"><code>[root@k8s-master istio-1.15.6]# kubectl -n istio-system edit svc kiali</code></pre>
+<p>在 spec.ports 的 http 节点添加 nodePort: 31001，并且修改 spec.type 的值为 NodePort，保存退出后配置生效即可通过 nodePort 端口访问 Kiali</p>
+<pre class="language-python"><code>[root@k8s-master istio-1.15.6]# kubectl -n istio-system edit svc kiali
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-access
-  namespace: scut-tech
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"kiali","app.kubernetes.io/instance":"kiali","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kiali","app.kubernetes.io/part-of":"kiali","app.kubernetes.io/version":"v1.55.1","helm.sh/chart":"kiali-server-1.55.1","version":"v1.55.1"},"name":"kiali","namespace":"istio-system"},"spec":{"ports":[{"name":"http","port":20001,"protocol":"TCP"},{"name":"http-metrics","port":9090,"protocol":"TCP"}],"selector":{"app.kubernetes.io/instance":"kiali","app.kubernetes.io/name":"kiali"}}}
+  creationTimestamp: "2023-04-06T14:45:20Z"
   labels:
-    app: redis
+    app: kiali
+    app.kubernetes.io/instance: kiali
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kiali
+    app.kubernetes.io/part-of: kiali
+    app.kubernetes.io/version: v1.55.1
+    helm.sh/chart: kiali-server-1.55.1
+    version: v1.55.1
+  name: kiali
+  namespace: istio-system
+  resourceVersion: "2183945"
+  uid: 731e8ea1-5e8a-415e-a140-b335e3b843b0
 spec:
-  selector:
-    app: redis
-    appCluster: redis-cluster
+  clusterIP: 10.108.49.233
+  clusterIPs:
+  - 10.108.49.233
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
   ports:
-  - name: redis-access
+  - name: http
+    port: 20001
     protocol: TCP
-    port: 6379
-    targetPort: 6379
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: redis
-  namespace: scut-tech
-spec:
-  serviceName: redis
-  replicas: 6
+    targetPort: 20001
+    nodePort: 31001
+  - name: http-metrics
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
   selector:
-    matchLabels:
-      app: redis
-      appCluster: redis-cluster
-  template:
-    metadata:
-      labels:
-        app: redis
-        appCluster: redis-cluster
-    spec:
-      terminationGracePeriodSeconds: 20
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - redis
-              topologyKey: kubernetes.io/hostname
-      containers:
-      - name: redis
-        image: redis:latest
-        command:
-        - "redis-server"
-        args:
-        - "/etc/redis/redis.conf"
-        - "--protected-mode"
-        - "no"
-        - "--cluster-announce-ip"
-        - "$(POD_IP)"
-        env:
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
-        resources:
-          requests:
-            cpu: "1000m"
-            memory: "1Gi"
-        ports:
-        - containerPort: 6379
-          name: redis
-          protocol: TCP
-        - containerPort: 16379
-          name: cluster
-          protocol: TCP
-        volumeMounts:
-        - name: conf
-          mountPath: /etc/redis
-        - name: data
-          mountPath: /var/lib/redis
-      volumes:
-      - name: conf
-        configMap:
-          name: redis-conf
-          items:
-          - key: redis.conf
-            path: redis.conf
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-      namespace: scut-tech
-    spec:
-      accessModes: ["ReadWriteMany"]
-      resources:
-        requests:
-          storage: 2Gi
-
-</code></pre>
-<p>命令如下：</p>
-<pre class="language-python"><code>kubectl apply -f redis.yaml</code></pre>
-<h3>3.2 初始化集群</h3>
-<p>查看集群节点状态：</p>
-<pre class="language-python"><code>kubectl get pods -n scut-tech</code></pre>
-<p>所有节点（redis-0 ~ redis-5）的 STATUS 都是 Running 状态后，再执行如下命令初始化集群：</p>
-<pre class="language-python"><code>kubectl exec -it redis-0 -n scut-tech -- redis-cli --cluster create `kubectl get pods -n scut-tech -l app=redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 '|awk '{print $1" "$2" "$3" "$4" "$5" "$6" "}'` --cluster-replicas 1</code></pre>
-<h3>3.3 验证集群部署</h3>
-<pre class="language-python"><code>kubectl exec -it redis-0 -n scut-tech -- redis-cli cluster info 
-for x in $(seq 0 5); do echo "redis-$x"; kubectl exec redis-$x -n cluster-redis -- redis-cli role; echo; done</code></pre>
-<h3>3.4 查看pod对应的DNS域名</h3>
-<pre class="language-python"><code>for x in $(seq 0 5); do kubectl exec redis-$x -n scut-tech -- hostname -f; done</code></pre>
-<h2>四、问题解答</h2>
-<h3>4.1 redis 集群出错怎样处理？</h3>
-<h4>4.1.1 删除集群</h4>
-<pre class="language-python"><code>kubectl delete -f redis.yaml</code></pre>
-<h4><br>4.1.2删除 nfs 配置</h4>
-<pre class="language-python"><code>rm -rf /data/redis/cluster*/**</code></pre>
-<h4><br>4.1.3 重启集群</h4>
-<pre class="language-python"><code>kubectl apply -f redis.yaml</code></pre>
-<h4><br>4.1.4 重新初始化集群</h4>
-<p>查看集群状态，所有的 redis 节点都正常启动后，再执行如下命令初始化集群：</p>
-<pre class="language-python"><code>kubectl exec -it redis-0 -n scut-tech -- redis-cli --cluster create `kubectl get pods -n scut-tech -l app=redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 '|awk '{print $1" "$2" "$3" "$4" "$5" "$6" "}'` --cluster-replicas 1</code></pre></div>
+    app.kubernetes.io/instance: kiali
+    app.kubernetes.io/name: kiali
+  sessionAffinity: None
+  type: NodePort #ClusterIP
+status:
+  loadBalancer: {}</code></pre>
+<p>&nbsp;</p></div>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <ul class="pager">
                     <li class="previous"><a
-                            href="/post/d17b0149ff8a">&larr;
-                        <span>Istio + k8s 安装部署过程</span> </a>
+                            href="/post/d17b757d20a3">&larr;
+                        <span>istio + k8s 如何增加节点和删除节点？</span> </a>
                     </li>
                     <li class="next">
-                        <a href="/post/d17b757d20a3"><span>istio + k8s 如何增加节点和删除节点？</span>
+                        <a href="/post/d18ddccb4ddf"><span>一次升级 k8s 集群版本的过程</span>
                             &rarr;</a>
                     </li>
                 </ul>

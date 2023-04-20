@@ -69,12 +69,12 @@
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">1,169</span>
+                                        <div> 字数 <span class="num">1,206</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">27</span>
+                                        阅读 <span class="num">109</span>
 
                                     </li>
                                 </ul>
@@ -184,7 +184,11 @@ registry.k8s.io/coredns/coredns:v1.9.3</code></pre>
 EOF
 
 systemctl restart network</code></pre>
-<h3>3.9 初始化 k8s-master</h3>
+<h3>3.9 配置 containerd</h3>
+<p>注：如果 config.toml 不存在，可以使用如下命令生成：</p>
+<pre class="language-python"><code>[root@k8s-master ~]# cd /etc/containerd/
+[root@k8s-master containerd]# containerd config default | sudo tee /etc/containerd/config.toml</code></pre>
+<h3>3.10 初始化 k8s-master</h3>
 <pre class="language-python"><code>kubeadm init \
 --apiserver-advertise-address=192.168.20.100 \
 --image-repository registry.aliyuncs.com/google_containers \
@@ -217,7 +221,7 @@ kubeadm join 192.168.20.100:6443 --token s3t3oe.4d7iiye9bsnzmo7k \
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl get nodes</code></pre>
-<h3>3.10 部署 CNI 网络插件（k8s-master）</h3>
+<h3>3.11 部署 CNI 网络插件（k8s-master）</h3>
 <p>部署CNI网络插件（如果有网络问题，需要/etc/hosts增加域名解析如：199.232.68.133 raw.githubusercontent.com），然后执行：</p>
 <pre class="language-python"><code>kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</code></pre>
 <p>或者直接下载&nbsp;<a title="kube-flannel.yml" href="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml" target="_blank" rel="noopener">https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</a></p>
@@ -226,7 +230,7 @@ kubectl get nodes</code></pre>
 <p>查看运行状态：</p>
 <pre class="language-python"><code>kubectl get pods -n kube-system
 kubectl get nodes</code></pre>
-<h3>3.11 初始化 node（初始化 master 时提示内容）</h3>
+<h3>3.12 初始化 node（初始化 master 时提示内容）</h3>
 <p>分别登录各节点，执行如下命令加入集群：</p>
 <pre class="language-python"><code>kubeadm join 192.168.20.100:6443 --token s3t3oe.4d7iiye9bsnzmo7k \
         --discovery-token-ca-cert-hash sha256:7ec91d6152705878a07fe418542f46fcbdd3eef8175433b933aaa5269a0d1dfe</code></pre>

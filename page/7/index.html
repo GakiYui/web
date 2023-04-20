@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>沧海拾贝 | istio + k8s 如何增加节点和删除节点？</title>
-    <meta content="在使用 istio + k8s 集群时，可能需要增加或删除节点，这对于版本平滑升级来说非常重要。本文详细介绍了在 istio + k8s 环境下增加和删除节点的过程，以供参考。" name="description">
+    <title>沧海拾贝 | 个人开发技术分享</title>
+    <meta content="基于Spring、React、Vue、Python，Spring Cloud微服务、K8s+istio服务网格、区块链的全栈开发技术，以及百度飞桨深度学习技术研究与分享" name="description">
     <meta content="java,spring boot,spring cloud,istio,python,react,vue,区块链,k8s,微服务,服务网格,深度学习,AI,机器学习" name="keywords">
     <link rel="icon" href="/assets/img/favicon.png">
     <link href="/assets/css/style.css" rel="stylesheet"/>
     <link href="/assets/css/main.css" rel="stylesheet"/>
-    <link href="//cdn.bootcss.com/highlight.js/11.7.0/styles/vs2015.min.css" rel="stylesheet"/>
 </head>
 <body class="home">
 <header id="header" class="header fixed-top d-flex align-items-center">
@@ -62,60 +61,145 @@
                     <div class="article-list">
                         <ul>
                             <li class="article-item">
-                                <h1 class="title">istio + k8s 如何增加节点和删除节点？</h1>
+                                <div class="article-content">
+                                    <h1 class="article-title">
+                                        <a href="/post/26ec819006cb">
+                                            <span>使用 vue-cli4 配置打包优化</span> </a>
+                                    </h1>
+                                    <div class="article-description">
+                                        <span>在vue-cli4项目中，通过 highlight.js，实现了页面中代码高亮显示。但页面打开速度变慢了很多，chunk-vendors.30c0fb60.js有1.2M，页面加载需要耗时5.6s，需要进行打包优化处理。通过使用 cdn 加载、打包压缩等方式，终于把该文件减少到 275KB，首页加载时间减少到不足3s。（新版本参考：再说 ant-design-vue 1.7.8 打包优化）1...</span>
+                                    </div>
+                                </div>
                                 <ul class="list-item-action">
                                     <li>
-                                        <span>2023-03-28 18:23</span>
+                                        <span>2020-01-10 18:05</span>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        <div> 字数 <span class="num">390</span>
+                                        <div> 字数 <span class="num">3,013</span>
                                         </div>
                                         <em class="list-item-action-split"></em>
                                     </li>
                                     <li>
-                                        阅读 <span class="num">47</span>
+                                        阅读 <span class="num">1,279</span>
 
                                     </li>
                                 </ul>
-                                <div class="show_content"><p>在使用 istio + k8s 集群时，可能需要增加或删除节点，这对于版本平滑升级来说非常重要。那么，在 istio + k8s 环境下是如何处理的呢？答案其实很简单，就是普通的 k8s 节点处理即可。</p>
-<h2>一、删除节点</h2>
-<p>如果需要在k8s集群中删除节点，首先需要在master节点上删除该节点的相关数据，再删除该节点，接着在该节点上进行 reset 操作，接着删除相关文件。</p>
-<h3>1.1 在 master 节点操作</h3>
-<pre class="language-python"><code># 其中&lt; node name &gt;是在k8s集群中使用&lt; kubectl get nodes &gt;查询到的节点名称
-kubectl drain &lt;node name&gt; --delete-emptydir-data --force --ignore-daemonsets
-kubectl delete node &lt;node name&gt;</code></pre>
-<h3>1.2 在需要删除的节点上</h3>
-<pre class="language-python"><code># 重置k8s
-sudo kubeadm reset</code></pre>
-<h2>二、增加节点</h2>
-<p>一般来说在 k8s 集群初始化完成的时候，会输出一条 token 来让我们添加其他的节点，但是这个 token 的有效时间只有24小时。</p>
-<h3>2.1 查询token</h3>
-<pre class="language-python"><code>kubeadm token list</code></pre>
-<h3>2.2 创建一个token</h3>
-<pre class="language-python"><code>kubeadm token create</code></pre>
-<h3>2.3 创建证书</h3>
-<p>除了token之外，我们还需要一个sha256的加密字符串，这个我们可以这样获得：</p>
-<pre class="language-python"><code>openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2&gt;/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'</code></pre>
-<h3>2.4 添加节点</h3>
-<p>接下来我们就可以把node节点添加到集群中了，命令的格式如下：</p>
-<pre class="language-python"><code>kubeadm join &lt;集群master节点IP：端口&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;sha256&gt;</code></pre>
-<p>对应的操作命令如下：</p>
-<pre class="language-python"><code>kubeadm join 192.168.20.100:6443 --token duinff.mca0i3mnigoeyf4o \
-        --discovery-token-ca-cert-hash sha256:e3bcbc9e93daf2c2b280516a2982086843f5c650ccbc8bd6d76131b219b64d6b	</code></pre></div>
+                            </li>
+                            <li class="article-item">
+                                <div class="article-content">
+                                    <h1 class="article-title">
+                                        <a href="/post/27626b08146b">
+                                            <span>Vue预渲染卡在Building fresh packages...</span> </a>
+                                    </h1>
+                                    <div class="article-description">
+                                        <span>最近学习 Vue.js，使用的是@vue/cli 4.1.0,需要对SPA进行SEO处理，采用prerender-spa-plugin及vue-meta-info方案。按一般步骤进行配置安装后，发现下载速度非常慢，同时在运行yarn build后，一直卡在Building fresh packages...</span>
+                                    </div>
+                                </div>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2020-01-07 09:28</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">649</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">208</span>
+
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="article-item">
+                                <div class="article-content">
+                                    <h1 class="article-title">
+                                        <a href="/post/2b7db5bbc709">
+                                            <span>JPA使用Example查询结果为空的问题</span> </a>
+                                    </h1>
+                                    <div class="article-description">
+                                        <span>使用Spring Data Jpa能够非常快速搭建基于JPA的关系数据库数据访问层，大大提高了开发效率。但在使用 Example 查询时，如果实体存在基本数据类型，可能会导致查询结果为空的的问题...</span>
+                                    </div>
+                                </div>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2020-01-04 23:19</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">486</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">291</span>
+
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="article-item">
+                                <div class="article-content">
+                                    <h1 class="article-title">
+                                        <a href="/post/2bca10c0da1c">
+                                            <span>Eclipse 4 RCP窗口居中-使用LifeCycleHandler</span> </a>
+                                    </h1>
+                                    <div class="article-description">
+                                        <span>谨以此文纪念我们逝去的青春。在 ERP 年代，使用 Eclipse RCP 进行跨平台桌面应用开发是一个非常不错的选择。本文是作者去年中忆苦思甜时，遇到 Eclipse 4 RCP 窗口居中的问题..</span>
+                                    </div>
+                                </div>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2020-01-03 15:27</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">1,984</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">366</span>
+
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="article-item">
+                                <div class="article-content">
+                                    <h1 class="article-title">
+                                        <a href="/post/2f5cf45b7b51">
+                                            <span>Ant Design of React项目实战</span> </a>
+                                    </h1>
+                                    <div class="article-description">
+                                        <span>在真实项目开发中，你可能会需要 Redux 或者 MobX 这样的数据流方案，Ant Design React 作为一个 UI 库，可以和任何 React 生态圈内的数据流方案以及应用框架搭配使用。我们基于 Redux 推出了自己的最佳实践 dva，以及可插拔的企业级应用框架 umi，推荐你在项目中使用...</span>
+                                    </div>
+                                </div>
+                                <ul class="list-item-action">
+                                    <li>
+                                        <span>2019-06-06 12:32</span>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        <div> 字数 <span class="num">1,292</span>
+                                        </div>
+                                        <em class="list-item-action-split"></em>
+                                    </li>
+                                    <li>
+                                        阅读 <span class="num">238</span>
+
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </div>
                 </div>
+                
                 <ul class="pager">
                     <li class="previous"><a
-                            href="/post/d17b3bd098b4">&larr;
-                        <span>Istio + k8s 安装 Redis 集群</span> </a>
+                            href="/page/6">&larr;
+                        Newer</a>
                     </li>
-                    <li class="next">
-                        <a href="/post/d18da1881745"><span>Istio 安装配置 Kiali 仪表板</span>
-                            &rarr;</a>
-                    </li>
+                    
                 </ul>
             </div>
             <div class="col-lg-4">
@@ -196,8 +280,6 @@ sudo kubeadm reset</code></pre>
          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAoCAYAAACWwljjAAAABGdBTUEAALGPC/xhBQAAAbtJREFUWAntmMtKw0AUhhMvS5cuxILgQlRUpIggIoKIIoigG1eC+AA+jo+i6FIXBfeuXIgoeKVeitVWJX5HWhhDksnUpp3FDPyZk3Nm5nycmZKkXhAEOXSA3lG7muTeRzmfy6HneUvIhnYkQK+Q9NhAA0Opg0vBEhjBKHiyb8iGMyQMOYuK41BcBSypAL+MYXSKjtFAW7EAGEO3qN4uMQbbAkXiSfRQJ1H6a+yhlkKRcAoVFYiweYNjtCVQJJpBz2GCiPt7fBOZQpFgDpUikse5HgnkM4Fi4QX0Fpc5wf9EbLqpUCy4jMoJSXWhFwbMNgWKhVbRhy5jirhs9fy/oFhgHVVTJEs7RLZ8sSEoJm6iz7SZDMbJ+/OKERQTttCXQRLToRUmrKWCYuA2+jbN0MB4OQobYShfdTCgn/sL1K36M7TLrN3n+758aPy2rrpR6+/od5E8tf/A1uLS9aId5T7J3CNYihkQ4D9PiMdMC7mp4rjB9kjFjZp8BlnVHJBuO1yFXIV0FdDF3RlyFdJVQBdv5AxVdIsq8apiZ2PyYO1EVykesGfZEESsCkweyR8MUW+V8uJ1gkYipmpdP1pm2aJVPEGzAAAAAElFTkSuQmCC">
 </a>
 <script src="/assets/js/main.js?v=5.0"></script>
-<script src="//cdn.bootcss.com/highlight.js/11.7.0/highlight.min.js"></script>
-<script>hljs.highlightAll();</script>
 <script async
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9644942625237459"
         crossorigin="anonymous"></script>
